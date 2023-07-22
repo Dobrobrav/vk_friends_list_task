@@ -8,7 +8,10 @@ from savers import CSVSaver, TSVSaver, JSONSaver
 def main():
     args_in = TerminalArgsLoader().load()
     friends_data = VkDataLoader().load_friends_data(
-        args_in.user_id, args_in.auth_token, args_in.page, args_in.limit,
+        user_id=args_in.user_id,
+        auth_token=args_in.auth_token,
+        page=args_in.page,
+        limit=args_in.limit,
     )
     save_friends_data(friends_data, args_in.out_path, args_in.out_format)
     print('Successful!')

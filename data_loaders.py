@@ -5,6 +5,7 @@ from typing import Literal
 
 from requests import Response
 
+import common
 from common import FriendData
 
 
@@ -14,6 +15,8 @@ class VkDataLoader:
         1: 'женский',
         2: 'мужской',
     }
+    _TOTAL_LIMIT = 100_000
+    _PAGE_LIMIT = 14
 
     def load_friends_data(self,
                           user_id: int,
@@ -24,7 +27,12 @@ class VkDataLoader:
                           limit: int | None = None,
                           ) -> list[FriendData]:
         response = self._request_friends_data(
-            auth_token, user_id, order, fields
+            auth_token=auth_token,
+            user_id=user_id,
+            order=order,
+            fields=fields,
+            page=page,
+            limit=limit,
         )
         friends_data = self._convert_friends_data(
             json.loads(response.content)['response']['items']
@@ -50,17 +58,40 @@ class VkDataLoader:
                               user_id: int,
                               order: str,
                               fields: str,
+                              page: int | None = None,
+                              limit: int | None = None,
                               ) -> Response:
         response = requests.get(
             url='https://api.vk.com/method/friends.get/',
-            params={'user_id': user_id,
-                    'v': self._API_VERSION,
-                    'order': order,
-                    'fields': fields},
+            params={
+                'user_id': user_id,
+                'v': self._API_VERSION,
+                'order': order,
+                'fields': fields,
+                'offset': self._calc_offset(page, limit),
+                'count': self._calc_count(limit),
+            },
             headers={'Authorization': f'Bearer {auth_token}'},
         )
         self._validate_response(response)
         return response
+
+    def _calc_offset(self,
+                     page: int | None,
+                     limit: int | None,
+                     ) -> int:
+        if page is None:
+            return 0
+        else:
+            return (limit or self._PAGE_LIMIT) * (page - 1)
+
+    def _calc_count(self,
+                    limit: int | None,
+                    ) -> int:
+        if limit is None:
+            return self._TOTAL_LIMIT
+        else:
+            return limit
 
     def _convert_friends_data(self,
                               friends_data_raw: list[dict],
@@ -96,10 +127,10 @@ class VkDataLoader:
         return self._GENDER_MAPPER[vk_format_gender]
 
     @staticmethod
-    def _get_field_or_not_stated(friend: dict,
+    def _get_field_or_not_stated(friend_data: dict,
                                  field_name: str
                                  ) -> str | int:
-        return friend.get(field_name) or 'не указано'
+        return friend_data.get(field_name) or 'не указано'
 
     @staticmethod
     def _get_field_or_not_stated_from_nested(friend: dict,

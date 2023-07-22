@@ -3,6 +3,8 @@ import sys
 from abc import ABC, abstractmethod
 from typing import NamedTuple, Literal
 
+import common
+
 
 class InputArgs(NamedTuple):
     auth_token: str
@@ -47,7 +49,7 @@ class TerminalArgsLoader(IInputArgsLoader):
         )
         parser.add_argument(
             '-lim', '--limit', type=int,
-            help='Quantity of rows in a single page'
+            help='Quantity of rows in a single page (positive)'
         )
 
         return self._filter_input_args(parser.parse_args())
@@ -55,6 +57,8 @@ class TerminalArgsLoader(IInputArgsLoader):
     @staticmethod
     def _filter_input_args(args_in: argparse.Namespace,
                            ) -> InputArgs:
+        common.validate_positive_int_or_none(args_in.page, 'page')
+        common.validate_positive_int_or_none(args_in.limit, 'limit')
         return InputArgs(
             auth_token=args_in.auth_token,
             user_id=args_in.user_id,
