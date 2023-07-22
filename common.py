@@ -1,3 +1,3 @@
 from typing import TypeAlias
 
-FriendRow: TypeAlias = dict[str, str | int]
+FriendData: TypeAlias = dict[str, str | int]

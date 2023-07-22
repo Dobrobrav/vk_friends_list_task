@@ -13,7 +13,7 @@ class InputArgs(NamedTuple):
     limit: int | None
 
 
-class IInputArgumentsLoader(ABC):
+class IInputArgsLoader(ABC):
     _ALLOWED_OUT_FORMATS = ('csv', 'tsv', 'json')
 
     @abstractmethod
@@ -21,7 +21,7 @@ class IInputArgumentsLoader(ABC):
         pass
 
 
-class TerminalArgumentsLoader(IInputArgumentsLoader):
+class TerminalArgsLoader(IInputArgsLoader):
 
     def load(self) -> InputArgs:
         parser = argparse.ArgumentParser()
@@ -49,9 +49,13 @@ class TerminalArgumentsLoader(IInputArgumentsLoader):
             '-lim', '--limit', type=int,
             help='Quantity of rows in a single page'
         )
-        args_in = parser.parse_args()
 
-        args = InputArgs(
+        return self._filter_input_args(parser.parse_args())
+
+    @staticmethod
+    def _filter_input_args(args_in: argparse.Namespace,
+                           ) -> InputArgs:
+        return InputArgs(
             auth_token=args_in.auth_token,
             user_id=args_in.user_id,
             out_path=args_in.out_path,
@@ -59,4 +63,3 @@ class TerminalArgumentsLoader(IInputArgumentsLoader):
             page=args_in.page,
             limit=args_in.limit,
         )
-        return args

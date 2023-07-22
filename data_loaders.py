@@ -3,7 +3,9 @@ import requests
 from datetime import datetime
 from typing import Literal
 
-from common import FriendRow
+from requests import Response
+
+from common import FriendData
 
 
 class VkDataLoader:
@@ -18,8 +20,38 @@ class VkDataLoader:
                           auth_token: str,
                           order: str = 'name',
                           fields: str = 'bdate, city, country, sex',
-                          ) -> list[FriendRow]:
-        data = requests.get(
+                          page: int | None = None,
+                          limit: int | None = None,
+                          ) -> list[FriendData]:
+        response = self._request_friends_data(
+            auth_token, user_id, order, fields
+        )
+        friends_data = self._convert_friends_data(
+            json.loads(response.content)['response']['items']
+        )
+        return friends_data
+
+    @staticmethod
+    def _validate_response(response: Response,
+                           ) -> None:
+        if 'error' in (content := json.loads(response.content)):
+            match content['error']['error_code']:
+                case 5:
+                    print('Please type a correct auth_key and try again')
+                case 18:
+                    print('Please type a correct user_id and try again')
+                case _:
+                    print('Something went wrong with the request to vk, '
+                          'please check data you typed and try again')
+            exit()
+
+    def _request_friends_data(self,
+                              auth_token: str,
+                              user_id: int,
+                              order: str,
+                              fields: str,
+                              ) -> Response:
+        response = requests.get(
             url='https://api.vk.com/method/friends.get/',
             params={'user_id': user_id,
                     'v': self._API_VERSION,
@@ -27,26 +59,35 @@ class VkDataLoader:
                     'fields': fields},
             headers={'Authorization': f'Bearer {auth_token}'},
         )
-        return self._convert_friends_data(json.loads(data.content)['response']['items'])
+        self._validate_response(response)
+        return response
 
     def _convert_friends_data(self,
-                              friends_raw: list[dict],
-                              ) -> list[FriendRow]:
+                              friends_data_raw: list[dict],
+                              ) -> list[FriendData]:
         res = [
             {
-                'Имя': self._get_field_or_not_stated(friend_raw, 'first_name'),
-                'Фамилия': self._get_field_or_not_stated(friend_raw, 'last_name'),
-                'Страна': self._get_field_or_not_stated_from_nested(friend_raw, 'country'),
-                'Город': self._get_field_or_not_stated_from_nested(friend_raw, 'city'),
-                'Дата рождения': self._get_birthdate(friend_raw),
-                'Пол': self._get_gender(friend_raw)
+                'Имя': self._get_field_or_not_stated(
+                    friend_data_raw, 'first_name'
+                ),
+                'Фамилия': self._get_field_or_not_stated(
+                    friend_data_raw, 'last_name'
+                ),
+                'Страна': self._get_field_or_not_stated_from_nested(
+                    friend_data_raw, 'country'
+                ),
+                'Город': self._get_field_or_not_stated_from_nested(
+                    friend_data_raw, 'city'
+                ),
+                'Дата рождения': self._get_birthdate(friend_data_raw),
+                'Пол': self._get_gender(friend_data_raw)
             }
-            for friend_raw in friends_raw
+            for friend_data_raw in friends_data_raw
         ]
         return res
 
     def _get_gender(self,
-                    friend: FriendRow,
+                    friend: FriendData,
                     ) -> Literal['мужской', 'женский', 'не указано']:
         vk_format_gender = self._get_field_or_not_stated(friend, 'sex')
         if vk_format_gender is None:
