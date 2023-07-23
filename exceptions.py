@@ -1,5 +1,4 @@
-
-class IncorrectInput(Exception):
+class InvalidInput(Exception):
     arg_name: str
     expected_value_descr: str
 
@@ -9,3 +8,7 @@ class IncorrectInput(Exception):
                  ) -> None:
         self.arg_name = arg_name
         self.expected_value_descr = expected_value_descr
+
+
+class UnknownVkError(Exception):
+    pass

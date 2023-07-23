@@ -1,6 +1,6 @@
 from typing import TypeAlias
 
-FriendData: TypeAlias = dict[str, str | int]
+FriendDataPretty: TypeAlias = dict[str, str | int]
 
 
 def validate_positive_int_or_none(value: int | None,

@@ -3,14 +3,14 @@ import json
 import tsv
 from abc import ABC, abstractmethod
 from typing import Sequence
-from common import FriendData
+from common import FriendDataPretty
 
 
 class ISaver(ABC):
 
     @abstractmethod
     def save(self,
-             friends: Sequence[FriendData],
+             friends: Sequence[FriendDataPretty],
              ) -> None:
         pass
 
@@ -27,7 +27,7 @@ class StorageSaverMixin:
 class CSVSaver(ISaver, StorageSaverMixin):
 
     def save(self,
-             friends: Sequence[FriendData],
+             friends: Sequence[FriendDataPretty],
              ) -> None:
         with open(f'{self._out_path}.csv', mode='w',
                   encoding='utf-8', newline='') as file:
@@ -39,7 +39,7 @@ class CSVSaver(ISaver, StorageSaverMixin):
 class TSVSaver(ISaver, StorageSaverMixin):
 
     def save(self,
-             friends: Sequence[FriendData],
+             friends: Sequence[FriendDataPretty],
              ) -> None:
         with open(f'{self._out_path}.tsv', mode='w',
                   encoding='utf-8', newline='') as file:
@@ -52,7 +52,7 @@ class TSVSaver(ISaver, StorageSaverMixin):
 class JSONSaver(ISaver, StorageSaverMixin):
 
     def save(self,
-             friends: Sequence[FriendData],
+             friends: Sequence[FriendDataPretty],
              ) -> None:
         with open(f'{self._out_path}.json', mode='w',
                 encoding='utf-8', newline='') as file:

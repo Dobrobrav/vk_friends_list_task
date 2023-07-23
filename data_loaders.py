@@ -1,17 +1,24 @@
 import json
+import pprint
+
+import pydantic_core
 import requests
 from datetime import datetime
-from typing import Literal
+from typing import Literal, TypeVar
 
 from requests import Response
 
 import common
-from common import FriendData
+from common import FriendDataPretty
+from exceptions import InvalidInput, UnknownVkError
+from vk_friends_pydantic import ResponseWrapper, FriendData, City, Country
+
+T = TypeVar('T')
 
 
 class VkDataLoader:
     _API_VERSION = 5.131
-    _GENDER_MAPPER: dict[int, Literal['мужской', 'женский']] = {
+    _GENDER_MAPPER: dict[Literal[1, 2], Literal['мужской', 'женский']] = {
         1: 'женский',
         2: 'мужской',
     }
@@ -25,8 +32,8 @@ class VkDataLoader:
                           fields: str = 'bdate, city, country, sex',
                           page: int | None = None,
                           limit: int | None = None,
-                          ) -> list[FriendData]:
-        response = self._request_friends_data(
+                          ) -> list[FriendDataPretty]:
+        raw_response = self._request_friends_data(
             auth_token=auth_token,
             user_id=user_id,
             order=order,
@@ -34,24 +41,12 @@ class VkDataLoader:
             page=page,
             limit=limit,
         )
-        friends_data = self._convert_friends_data(
-            json.loads(response.content)['response']['items']
+        validated_data = self._validate_response(raw_response)
+        friends_data_pretty = self._convert_friends_data_to_pretty(
+            friends_data=validated_data.response.items
         )
-        return friends_data
 
-    @staticmethod
-    def _validate_response(response: Response,
-                           ) -> None:
-        if 'error' in (content := json.loads(response.content)):
-            match content['error']['error_code']:
-                case 5:
-                    print('Please type a correct auth_key and try again')
-                case 18:
-                    print('Please type a correct user_id and try again')
-                case _:
-                    print('Something went wrong with the request to vk, '
-                          'please check data you typed and try again')
-            exit()
+        return friends_data_pretty
 
     def _request_friends_data(self,
                               auth_token: str,
@@ -61,7 +56,7 @@ class VkDataLoader:
                               page: int | None = None,
                               limit: int | None = None,
                               ) -> Response:
-        response = requests.get(
+        return requests.get(
             url='https://api.vk.com/method/friends.get/',
             params={
                 'user_id': user_id,
@@ -73,8 +68,28 @@ class VkDataLoader:
             },
             headers={'Authorization': f'Bearer {auth_token}'},
         )
-        self._validate_response(response)
-        return response
+
+
+    @staticmethod
+    def _validate_response(response: Response,
+                           ) -> ResponseWrapper | None:
+        if 'error' in (content := json.loads(response.content)):
+            match content['error']['error_code']:
+                case 5:
+                    raise InvalidInput(
+                        arg_name='auth_key',
+                        expected_value_descr='valid vk authentication key',
+                    )
+                case 18:
+                    raise InvalidInput(
+                        arg_name='user_id',
+                        expected_value_descr='valid vk user id',
+                    )
+                case _:
+                    raise UnknownVkError()
+
+        validated_data = ResponseWrapper.model_validate_json(response.content)
+        return validated_data
 
     def _calc_offset(self,
                      page: int | None,
@@ -93,56 +108,49 @@ class VkDataLoader:
         else:
             return limit
 
-    def _convert_friends_data(self,
-                              friends_data_raw: list[dict],
-                              ) -> list[FriendData]:
+    def _convert_friends_data_to_pretty(self,
+                                        friends_data: list[FriendData],
+                                        ) -> list[FriendDataPretty]:
         res = [
             {
-                'Имя': self._get_field_or_not_stated(
-                    friend_data_raw, 'first_name'
+                'Имя': self._get_value_or_empty(friend_data.first_name),
+                'Фамилия': self._get_value_or_empty(friend_data.last_name),
+                'Страна': self._get_field_or_empty_from_nested(
+                    friend_data.country
                 ),
-                'Фамилия': self._get_field_or_not_stated(
-                    friend_data_raw, 'last_name'
+                'Город': self._get_field_or_empty_from_nested(
+                    friend_data.city
                 ),
-                'Страна': self._get_field_or_not_stated_from_nested(
-                    friend_data_raw, 'country'
-                ),
-                'Город': self._get_field_or_not_stated_from_nested(
-                    friend_data_raw, 'city'
-                ),
-                'Дата рождения': self._get_birthdate(friend_data_raw),
-                'Пол': self._get_gender(friend_data_raw)
+                'Дата рождения': self._get_birthdate(friend_data),
+                'Пол': self._get_gender(friend_data)
             }
-            for friend_data_raw in friends_data_raw
+            for friend_data in friends_data
         ]
         return res
 
     def _get_gender(self,
                     friend: FriendData,
                     ) -> Literal['мужской', 'женский', 'не указано']:
-        vk_format_gender = self._get_field_or_not_stated(friend, 'sex')
+        vk_format_gender = self._get_value_or_empty(friend.sex)
         if vk_format_gender is None:
             return 'не указано'
 
         return self._GENDER_MAPPER[vk_format_gender]
 
     @staticmethod
-    def _get_field_or_not_stated(friend_data: dict,
-                                 field_name: str
-                                 ) -> str | int:
-        return friend_data.get(field_name) or 'не указано'
+    def _get_value_or_empty(value: T,
+                            ) -> Literal['не указано'] | T:
+        return value or 'не указано'
 
     @staticmethod
-    def _get_field_or_not_stated_from_nested(friend: dict,
-                                             field_name: str,
-                                             ) -> str:
-        field_value = friend.get(field_name)
-        return 'не указано' if field_value is None else field_value['title']
+    def _get_field_or_empty_from_nested(nested_value: City | Country,
+                                        ) -> str:
+        return 'не указано' if nested_value is None else nested_value.title
 
     def _get_birthdate(self,
-                       friend: dict,
+                       friend: FriendData,
                        ) -> str:
-        raw_birthdate = self._get_field_or_not_stated(friend, 'bdate')
+        raw_birthdate = self._get_value_or_empty(friend.bdate)
         if raw_birthdate == 'не указано':
             return 'не указано'
 

@@ -4,14 +4,14 @@ from abc import ABC, abstractmethod
 from typing import NamedTuple, Literal
 
 import common
-from exceptions import IncorrectInput
+from exceptions import InvalidInput
 
 
 class InputArgs(NamedTuple):
     auth_token: str
     user_id: int
-    out_format: Literal['csv', 'tsv', 'json']
-    out_path: str
+    output_format: Literal['csv', 'tsv', 'json']
+    output_path: str
     page: int | None
     limit: int | None
 
@@ -24,7 +24,7 @@ class IInputArgsLoader(ABC):
         pass
 
 
-class TerminalArgsLoader(IInputArgsLoader):
+class ArgsFromTerminalLoader(IInputArgsLoader):
 
     def load(self) -> InputArgs:
         parser = argparse.ArgumentParser()
@@ -56,33 +56,33 @@ class TerminalArgsLoader(IInputArgsLoader):
         return self._filter_input_args(parser.parse_args())
 
     def _filter_input_args(self,
-                           args_in: argparse.Namespace,
+                           input_args: argparse.Namespace,
                            ) -> InputArgs:
-        self._validate_args_in(args_in)
+        self._validate_input_args(input_args)
 
         return InputArgs(
-            auth_token=args_in.auth_token,
-            user_id=args_in.user_id,
-            out_path=args_in.out_path,
-            out_format=args_in.out_format.lower(),
-            page=args_in.page,
-            limit=args_in.limit,
+            auth_token=input_args.auth_token,
+            user_id=input_args.user_id,
+            output_path=input_args.out_path,
+            output_format=input_args.out_format.lower(),
+            page=input_args.page,
+            limit=input_args.limit,
         )
 
     @staticmethod
-    def _validate_args_in(args_in: argparse.Namespace,
-                          ) -> None:
+    def _validate_input_args(input_args: argparse.Namespace,
+                             ) -> None:
         try:
-            common.validate_positive_int_or_none(args_in.page)
+            common.validate_positive_int_or_none(input_args.page)
         except (TypeError, ValueError):
-            raise IncorrectInput(
+            raise InvalidInput(
                 arg_name='page',
                 expected_value_descr='a positive integer',
             )
         try:
-            common.validate_positive_int_or_none(args_in.limit)
+            common.validate_positive_int_or_none(input_args.limit)
         except (TypeError, ValueError):
-            raise IncorrectInput(
+            raise InvalidInput(
                 arg_name='limit',
                 expected_value_descr='a positive integer',
             )
