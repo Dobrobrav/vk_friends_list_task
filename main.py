@@ -20,8 +20,8 @@ def main():
         print(f"Please type {e.expected_value_descr}"
               f" for <{e.arg_name}> argument")
     except Exception as e:
-        print(f'Something unexpected went wrong: {e},'
-              f' please check the input arguments and try again')
+        print(f'Something unexpected went wrong. Error message: {e}. '
+              f'Please check the input arguments and try again (maybe later)')
         # log it
     else:
         print('Successful!')
@@ -33,15 +33,15 @@ def save_friends_data(friends: Sequence[FriendData],
                       ) -> None:
     match out_format:
         case 'csv':
-            saver = CSVSaver()
+            saver = CSVSaver(out_path)
         case 'tsv':
-            saver = TSVSaver()
+            saver = TSVSaver(out_path)
         case 'json':
-            saver = JSONSaver()
+            saver = JSONSaver(out_path)
         case _:
             raise ValueError('the format must be one of the allowed')
 
-    saver.save(friends, out_path)
+    saver.save(friends)
 
 
 if __name__ == '__main__':
