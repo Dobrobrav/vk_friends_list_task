@@ -9,6 +9,7 @@ from typing import Literal, TypeVar
 from requests import Response
 
 import common
+import log_utils
 from common import FriendDataPretty
 from exceptions import InvalidInput, UnknownVkError
 from vk_friends_pydantic import ResponseWrapper, FriendData, City, Country
@@ -33,6 +34,8 @@ class VkDataLoader:
                           page: int | None = None,
                           limit: int | None = None,
                           ) -> list[FriendDataPretty]:
+        log_utils.log_start_loading_friends_data(user_id)
+
         raw_response = self._request_friends_data(
             auth_token=auth_token,
             user_id=user_id,
@@ -46,6 +49,10 @@ class VkDataLoader:
             friends_data=validated_data.response.items
         )
 
+        log_utils.log_finish_loading_friends_data(
+            user_id, friends_data_pretty,
+        )
+
         return friends_data_pretty
 
     def _request_friends_data(self,
@@ -56,7 +63,11 @@ class VkDataLoader:
                               page: int | None = None,
                               limit: int | None = None,
                               ) -> Response:
-        return requests.get(
+        log_utils.log_start_http_request(
+            url='https://api.vk.com/method/friends.get/'
+        )
+
+        request_raw = requests.get(
             url='https://api.vk.com/method/friends.get/',
             params={
                 'user_id': user_id,
@@ -69,10 +80,17 @@ class VkDataLoader:
             headers={'Authorization': f'Bearer {auth_token}'},
         )
 
+        log_utils.log_finish_http_request(
+            url='https://api.vk.com/method/friends.get/'
+        )
+
+        return request_raw
 
     @staticmethod
     def _validate_response(response: Response,
                            ) -> ResponseWrapper | None:
+        log_utils.log_start_validating_response()
+
         if 'error' in (content := json.loads(response.content)):
             match content['error']['error_code']:
                 case 5:
@@ -91,6 +109,9 @@ class VkDataLoader:
                     raise UnknownVkError()
 
         validated_data = ResponseWrapper.model_validate_json(response.content)
+
+        log_utils.log_finish_validating_response()
+
         return validated_data
 
     def _calc_offset(self,
