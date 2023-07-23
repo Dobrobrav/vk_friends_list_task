@@ -12,6 +12,22 @@ today_date = datetime.date.today()
 logger.add(f"logs/app_log.{today_date}.log", rotation="1 day", level='INFO')
 
 
+def log_start_loading_terminal_args():
+    logger.info(f"Start loading args from terminal")
+
+
+def log_finish_loading_terminal_args():
+    logger.info(f"Finish loading args from terminal")
+
+
+def log_start_validating_terminal_args():
+    logger.info(f"Start validating args from terminal")
+
+
+def log_finish_validating_terminal_args():
+    logger.info(f"Finish validating args from terminal")
+
+
 def log_start_loading_friends_data(user_id: int,
                                    ) -> None:
     logger.info(f"Start loading friends data for {user_id}")

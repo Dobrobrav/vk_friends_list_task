@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from typing import NamedTuple, Literal
 
 import common
+import log_utils
 from exceptions import InvalidInput
 
 
@@ -27,6 +28,7 @@ class IInputArgsLoader(ABC):
 
 class TerminalArgsLoader(IInputArgsLoader):
     """ Loads input arguments from terminal """
+    log_utils.log_start_loading_terminal_args()
 
     def load(self) -> InputArgs:
         parser = argparse.ArgumentParser()
@@ -55,7 +57,11 @@ class TerminalArgsLoader(IInputArgsLoader):
             help='Quantity of rows in a single page (positive)'
         )
 
-        return self._filter_input_args(parser.parse_args())
+        filtered_args = self._filter_input_args(parser.parse_args())
+
+        log_utils.log_finish_loading_terminal_args()
+
+        return filtered_args
 
     def _filter_input_args(self,
                            input_args: argparse.Namespace,
@@ -74,6 +80,8 @@ class TerminalArgsLoader(IInputArgsLoader):
     @staticmethod
     def _validate_input_args(input_args: argparse.Namespace,
                              ) -> None:
+        log_utils.log_start_validating_terminal_args()
+
         try:
             common.validate_positive_int_or_none(input_args.page)
         except (TypeError, ValueError):
@@ -88,3 +96,5 @@ class TerminalArgsLoader(IInputArgsLoader):
                 arg_name='limit',
                 expected_value_descr='a positive integer',
             )
+
+        log_utils.log_finish_validating_terminal_args()
