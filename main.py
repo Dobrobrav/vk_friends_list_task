@@ -3,12 +3,7 @@ from data_loaders import VkDataLoader
 from exceptions import InvalidInput, UnknownVkError
 from input_args_loaders import TerminalArgsLoader
 from savers import save_friends_data
-from loguru import logger
-
-# remove default loguru handler to stop logging to terminal
-logger.remove()
-# set up logger to log to file
-logger.add("logs/app_log.log", rotation="1 day", level='INFO')
+from log_utils import logger
 
 
 def main():

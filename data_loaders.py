@@ -79,13 +79,13 @@ class VkDataLoader:
                     raise InvalidInput(
                         arg_name='auth_key',
                         expected_value_descr='valid vk authentication key',
-                        log_error_descr='invalid vk authentication key',
+                        log_error_descr='Invalid vk authentication key',
                     )
                 case 18:
                     raise InvalidInput(
                         arg_name='user_id',
                         expected_value_descr='valid vk user id',
-                        log_error_descr='invalid vk user id'
+                        log_error_descr='Invalid vk user id'
                     )
                 case _:
                     raise UnknownVkError()
