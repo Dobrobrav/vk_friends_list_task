@@ -17,6 +17,7 @@ class InputArgs(NamedTuple):
 
 
 class IInputArgsLoader(ABC):
+    """ Loads input arguments """
     _ALLOWED_OUT_FORMATS = ('csv', 'tsv', 'json')
 
     @abstractmethod
@@ -24,7 +25,8 @@ class IInputArgsLoader(ABC):
         pass
 
 
-class ArgsFromTerminalLoader(IInputArgsLoader):
+class TerminalArgsLoader(IInputArgsLoader):
+    """ Loads input arguments from terminal """
 
     def load(self) -> InputArgs:
         parser = argparse.ArgumentParser()
