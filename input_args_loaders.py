@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from typing import NamedTuple, Literal
 
 import common
+from exceptions import IncorrectInput
 
 
 class InputArgs(NamedTuple):
@@ -54,11 +55,11 @@ class TerminalArgsLoader(IInputArgsLoader):
 
         return self._filter_input_args(parser.parse_args())
 
-    @staticmethod
-    def _filter_input_args(args_in: argparse.Namespace,
+    def _filter_input_args(self,
+                           args_in: argparse.Namespace,
                            ) -> InputArgs:
-        common.validate_positive_int_or_none(args_in.page, 'page')
-        common.validate_positive_int_or_none(args_in.limit, 'limit')
+        self._validate_args_in(args_in)
+
         return InputArgs(
             auth_token=args_in.auth_token,
             user_id=args_in.user_id,
@@ -67,3 +68,21 @@ class TerminalArgsLoader(IInputArgsLoader):
             page=args_in.page,
             limit=args_in.limit,
         )
+
+    @staticmethod
+    def _validate_args_in(args_in: argparse.Namespace,
+                          ) -> None:
+        try:
+            common.validate_positive_int_or_none(args_in.page)
+        except (TypeError, ValueError):
+            raise IncorrectInput(
+                arg_name='page',
+                expected_value_descr='a positive integer',
+            )
+        try:
+            common.validate_positive_int_or_none(args_in.limit)
+        except (TypeError, ValueError):
+            raise IncorrectInput(
+                arg_name='limit',
+                expected_value_descr='a positive integer',
+            )
