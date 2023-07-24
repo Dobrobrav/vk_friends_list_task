@@ -15,15 +15,21 @@ VK Friends Report Generator is a console application that generates a report con
    * -f / --output_format (optional argument, default: "csv" – format of the report
    * -pg / --page (optional argument, if None, then no pagination) – requested page
    * -l / --limit (optional argument, default: 14, only works if _page_ is provided) – max page size
+  
+   #### Example input
+   ```console
+   python main.py -a vk1.a.m7VxRgYSK8UgTc1VXFdEFdFviqalIoQL2ljBAuFrVpzeyODYKOLqrG6UYod7NzMnmqYcFzv4RY2rZwiHY5X6WEyJg32v7Xo2QNae8lJgiuOgSAOzuGng8Az77eDfSRJvlQZrddlFFusfJVzCVQotvzV5vpjjRPju1VMWIzGdH8qRr_PxPe9mXP3k672Wwaqtugru2kZb67WTgt9PUD8DqQ -p res -f json -l 12 -pg 5
+   ```   
      
 
 ### How to get vk access token:
 1. Open https://vk.com/editapp?act=create
 2. Create a standalone app
-3. Open 'settings'
-4. Turn the app on
-5. Find App's ID and copy it
-6. Insert https://oauth.vk.com/authorize?client_id=[APP'S-ID]&redirect_uri=https://oauth.vk.com/blank.html&response_type=token&display=page into your browser's searchbar __(make sure to replace [APP'S-ID] with your app's id).__
+3. Open "settings"
+4. Changes the app's state to "turned on"
+5. Save the changes
+6. Find App's ID and copy it
+7. Insert https://oauth.vk.com/authorize?client_id=[APP'S-ID]&redirect_uri=https://oauth.vk.com/blank.html&response_type=token&display=page into your browser's searchbar __(make sure to replace [APP'S-ID] with your app's id).__
    You should get somethings like this https://oauth.vk.com/authorize?client_id=123456&redirect_uri=https://oauth.vk.com/blank.html&response_type=token&display=page
 8. Authenticate if necessary
 9. Extract __access_token__ and __user_id__ values from the link in the searchbar
