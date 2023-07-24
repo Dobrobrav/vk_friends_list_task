@@ -10,7 +10,7 @@ logger.remove()
 
 # set up logger to logs to file
 today_date = datetime.date.today()
-logger.add(f"logs/log_files/{today_date}.log", rotation="1 day", level='DEBUG')
+logger.add(f"logs/{today_date}.log", rotation="1 day", level='DEBUG')
 
 
 class InputArgs(NamedTuple):
