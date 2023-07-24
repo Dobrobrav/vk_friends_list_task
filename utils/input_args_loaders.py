@@ -1,10 +1,9 @@
 import argparse
 from abc import ABC, abstractmethod
 from typing import NamedTuple, Literal
-import common
-import logs.utils.input_args_loaders_log
-import logs.utils.input_args_loaders_log
-from exceptions import InvalidInputError
+from . import common
+import logs.utils.for_input_args_loaders
+from .exceptions import InvalidInputError
 
 
 class InputArgs(NamedTuple):
@@ -29,7 +28,7 @@ class TerminalArgsLoader(IInputArgsLoader):
     """ Loads input arguments from terminal """
 
     def load(self) -> InputArgs:
-        logs.utils.input_args_loaders_log.log_start_loading_terminal_args()
+        logs.utils.for_input_args_loaders.log_start_loading_terminal_args()
 
         parser = argparse.ArgumentParser()
         parser.add_argument(
@@ -55,17 +54,17 @@ class TerminalArgsLoader(IInputArgsLoader):
             '-lim', '--limit', type=int,
             help='Quantity of rows in a single page (positive)'
         )
-        filtered_args = self._filter_input_args(parser.parse_args())
+        args = parser.parse_args()
+        self._validate_input_args(args)
+        filtered_args = self._filter_input_args(args)
 
-        logs.utils.input_args_loaders_log.log_finish_loading_terminal_args()
+        logs.utils.for_input_args_loaders.log_finish_loading_terminal_args()
 
         return filtered_args
 
     def _filter_input_args(self,
                            input_args: argparse.Namespace,
                            ) -> InputArgs:
-        self._validate_input_args(input_args)
-
         return InputArgs(
             auth_token=input_args.auth_token,
             user_id=input_args.user_id,
@@ -78,7 +77,7 @@ class TerminalArgsLoader(IInputArgsLoader):
     @staticmethod
     def _validate_input_args(input_args: argparse.Namespace,
                              ) -> None:
-        logs.utils.input_args_loaders_log.log_start_validating_terminal_args()
+        logs.utils.for_input_args_loaders.log_start_validating_terminal_args()
 
         try:
             common.validate_positive_int_or_none(input_args.page)
@@ -86,6 +85,7 @@ class TerminalArgsLoader(IInputArgsLoader):
             raise InvalidInputError(
                 arg_name='page',
                 expected_value_descr='a positive integer',
+                log_error_descr='Invalid page value',
             )
         try:
             common.validate_positive_int_or_none(input_args.limit)
@@ -93,6 +93,7 @@ class TerminalArgsLoader(IInputArgsLoader):
             raise InvalidInputError(
                 arg_name='limit',
                 expected_value_descr='a positive integer',
+                log_error_descr='Invalid limit value',
             )
 
-        logs.utils.input_args_loaders_log.log_finish_validating_terminal_args()
+        logs.utils.for_input_args_loaders.log_finish_validating_terminal_args()

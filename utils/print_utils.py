@@ -1,15 +1,15 @@
 import pydantic_core
 
-from exceptions import InvalidInputError
+from .exceptions import InvalidInputError
 
 
-# for main.py
+# for for_main.py
 def print_started():
     print("STARTED")
 
 
 def print_finished():
-    print('SUCCESSFUL!')
+    print('FINISHED!')
 
 
 def print_invalid_input(e: InvalidInputError,

@@ -1,14 +1,14 @@
 import json
-
 import pydantic_core
 import requests
+import logs.utils.for_data_loaders
 from datetime import datetime
 from typing import Literal, TypeVar
 from requests import Response
-import logs.utils.data_loaders_log
-from common import FriendDataPretty
-from exceptions import InvalidInputError, UnexpectedVkError
-from vk_friends_pydantic import ResponseWrapper, FriendData, City, Country
+from .common import FriendDataPretty
+from .exceptions import InvalidInputError, UnexpectedVkError
+from .vk_friends_pydantic import ResponseWrapper, FriendData, City, Country
+from logs.utils.common import logger
 
 T = TypeVar('T')
 
@@ -30,7 +30,7 @@ class VkDataLoader:
                           page: int | None = None,
                           limit: int | None = None,
                           ) -> list[FriendDataPretty]:
-        logs.utils.data_loaders_log.log_start_loading_friends_data(user_id)
+        logs.utils.for_data_loaders.log_start_loading_friends_data(user_id)
 
         raw_response = self._request_friends_data(
             auth_token=auth_token,
@@ -45,7 +45,7 @@ class VkDataLoader:
             friends_data=validated_data.response.items
         )
 
-        logs.utils.data_loaders_log.log_finish_loading_friends_data(
+        logs.utils.for_data_loaders.log_finish_loading_friends_data(
             user_id, friends_data_pretty,
         )
 
@@ -59,7 +59,7 @@ class VkDataLoader:
                               page: int | None = None,
                               limit: int | None = None,
                               ) -> Response:
-        logs.utils.data_loaders_log.log_start_http_request(
+        logs.utils.for_data_loaders.log_start_http_request(
             url='https://api.vk.com/method/friends.get/'
         )
 
@@ -76,7 +76,7 @@ class VkDataLoader:
             headers={'Authorization': f'Bearer {auth_token}'},
         )
 
-        logs.utils.data_loaders_log.log_finish_http_request(
+        logs.utils.for_data_loaders.log_finish_http_request(
             url='https://api.vk.com/method/friends.get/'
         )
 
@@ -85,7 +85,7 @@ class VkDataLoader:
     @staticmethod
     def _validate_response(response: Response,
                            ) -> ResponseWrapper | None:
-        logs.utils.data_loaders_log.log_start_validating_response()
+        logs.utils.for_data_loaders.log_start_validating_response()
 
         if 'error' in (content := json.loads(response.content)):
             match content['error']['error_code']:
@@ -103,6 +103,7 @@ class VkDataLoader:
                     )
                 case _:
                     raise UnexpectedVkError()
+
         try:
             validated_data = ResponseWrapper.model_validate_json(response.content)
         except pydantic_core.ValidationError as e:
@@ -110,7 +111,11 @@ class VkDataLoader:
                 f'Wrong vk response data structure: {e}'
             )
 
-        logs.utils.data_loaders_log.log_finish_validating_response()
+        if len(validated_data.response.items) == 0:
+            print('No friends found. Either you don\'t have vk friends , '
+                  'or the <page> or/and <limit> arguments are too high')
+
+        logs.utils.for_data_loaders.log_finish_validating_response()
 
         return validated_data
 
