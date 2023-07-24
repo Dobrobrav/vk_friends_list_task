@@ -5,7 +5,7 @@ import common
 
 class IInputArgsLoader(ABC):
     """ Loads input arguments """
-    _ALLOWED_OUT_FORMATS = ('csv', 'tsv', 'json')
+    _ALLOWED_OUTPUT_FORMATS = ('csv', 'tsv', 'json')
 
     @abstractmethod
     def load(self):
@@ -27,11 +27,11 @@ class TerminalArgsLoader(IInputArgsLoader):
             '-uid', '--user_id', type=int, help='Vk user id',
         )
         parser.add_argument(
-            '-f', '--out_format', type=str, help='Output file format',
-            default='csv', choices=self._ALLOWED_OUT_FORMATS,
+            '-f', '--output_format', type=str, help='Output file format',
+            default='csv', choices=self._ALLOWED_OUTPUT_FORMATS,
         )
         parser.add_argument(
-            '-p', '--out_path', type=str,
+            '-p', '--output_path', type=str,
             help='Output file path', default='report',
         )
         parser.add_argument(
@@ -55,8 +55,8 @@ class TerminalArgsLoader(IInputArgsLoader):
         return common.InputArgs(
             auth_token=input_args.auth_token,
             user_id=input_args.user_id,
-            output_path=input_args.out_path,
-            output_format=input_args.out_format.lower(),
+            output_path=input_args.output_path,
+            output_format=input_args.output_format.lower(),
             page=input_args.page,
             limit=input_args.limit,
         )
