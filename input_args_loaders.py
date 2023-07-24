@@ -24,8 +24,7 @@ class TerminalArgsLoader(IInputArgsLoader):
             help='Auth token for vk', required=True,
         )
         parser.add_argument(
-            '-uid', '--user_id', type=int,
-            help='Vk user id', required=True,
+            '-uid', '--user_id', type=int, help='Vk user id',
         )
         parser.add_argument(
             '-f', '--out_format', type=str, help='Output file format',

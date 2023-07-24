@@ -81,7 +81,6 @@ def print_unexpected_error(e: Exception,
 
 
 # LOGGING FUNCTIONS
-
 def log_started():
     logger.info('Program started')
 

@@ -15,7 +15,7 @@ logger.add(f"logs/log_files/{today_date}.log", rotation="1 day", level='DEBUG')
 
 class InputArgs(NamedTuple):
     auth_token: str
-    user_id: int
+    user_id: int | None
     output_format: Literal['csv', 'tsv', 'json']
     output_path: str
     page: int | None

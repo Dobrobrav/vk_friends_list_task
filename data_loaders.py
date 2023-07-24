@@ -21,7 +21,7 @@ class VkDataLoader:
     _PAGE_LIMIT = 14
 
     def load_friends_data(self,
-                          user_id: int,
+                          user_id: int | None,
                           auth_token: str,
                           order: str = 'name',
                           fields: str = 'bdate, city, country, sex',
