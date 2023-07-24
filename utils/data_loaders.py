@@ -105,7 +105,9 @@ class VkDataLoader:
                     raise UnexpectedVkError()
 
         try:
-            validated_data = ResponseWrapper.model_validate_json(response.content)
+            validated_data = ResponseWrapper.model_validate_json(
+                response.content
+            )
         except pydantic_core.ValidationError as e:
             raise pydantic_core.ValidationError(
                 f'Wrong vk response data structure: {e}'
@@ -187,11 +189,14 @@ class VkDataLoader:
     @staticmethod
     def _convert_to_iso(date_str):
         for format in ("%d.%m", "%d.%m.%Y"):
+            # try converting date to on of the formats
             try:
                 date_obj = datetime.strptime(date_str, format)
+                # if format '%d.%m', 1900 year is automatically assigned. not good
                 if date_obj.year == 1900:
                     return date_obj.strftime("%d-%m")
                 else:
                     return date_obj.date().isoformat()
+            # if conversion fails, try the other format
             except ValueError:
                 continue
