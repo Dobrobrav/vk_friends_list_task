@@ -1,14 +1,17 @@
 import pydantic_core
+
+import logs.utils.main_log
+import print_utils
 from data_loaders import VkDataLoader
-from exceptions import InvalidInput, UnknownVkError
+from exceptions import InvalidInputError, UnexpectedVkError
 from input_args_loaders import TerminalArgsLoader
 from savers import save_friends_data
-from log_utils import logger
 
 
 def main():
-    logger.info('Program started')
-    print("STARTED")
+    logs.utils.main_log.log_started()
+    print_utils.print_started()
+
     try:
         input_args = TerminalArgsLoader().load()
         friends_data = VkDataLoader().load_friends_data(
@@ -20,25 +23,23 @@ def main():
         save_friends_data(friends_data,
                           input_args.output_path,
                           input_args.output_format)
-    except InvalidInput as e:
-        print(f"Please type {e.expected_value_descr}"
-              f" for <{e.arg_name}> argument and try again")
-        logger.error(e.log_error_descr)
-    except pydantic_core.ValidationError:
-        print(f"Vk response data structure is incorrect. "
-              f"Please try again later.")
-        logger.error("Wrong vk response data structure")
-    except UnknownVkError as e:
-        print('Something went wrong with the request to vk.'
-              'Please check the arguments you typed and try again (maybe later)')
-        logger.error(f"Unexpected vk error: {e}")
+    except InvalidInputError as e:
+        print_utils.print_invalid_input(e)
+        logs.utils.main_log.log_invalid_input_error(e)
+    except pydantic_core.ValidationError as e:
+        print_utils.print_pydantic_validation_error()
+        logs.utils.main_log.log_pydantic_validation_error(e)
+
+    except UnexpectedVkError as e:
+        print_utils.print_unknown_vk_error()
+        logs.utils.main_log.log_unexpected_vk_error(e)
+
     except Exception as e:
-        print(f'Something unexpected went wrong. Error message: {e}. '
-              f'Please check the input arguments and try again (maybe later)')
-        logger.error(f"Unexpected error: {e}")
+        print_utils.print_unexpected_error(e)
+        logs.utils.main_log.log_unexpected_error(e)
     else:
-        print('SUCCESSFUL!')
-        logger.info("Program finished successfully")
+        print_utils.print_finished()
+        logs.utils.main_log.log_finished()
 
 
 if __name__ == '__main__':

@@ -1,4 +1,4 @@
-class InvalidInput(Exception):
+class InvalidInputError(Exception):
     arg_name: str
     expected_value_descr: str
     log_error_descr: str
@@ -13,5 +13,5 @@ class InvalidInput(Exception):
         self.log_error_descr = log_error_descr
 
 
-class UnknownVkError(Exception):
+class UnexpectedVkError(Exception):
     pass

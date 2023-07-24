@@ -1,17 +1,13 @@
 import json
-import pprint
 
 import pydantic_core
 import requests
 from datetime import datetime
 from typing import Literal, TypeVar
-
 from requests import Response
-
-import common
-import log_utils
+import logs.utils.data_loaders_log
 from common import FriendDataPretty
-from exceptions import InvalidInput, UnknownVkError
+from exceptions import InvalidInputError, UnexpectedVkError
 from vk_friends_pydantic import ResponseWrapper, FriendData, City, Country
 
 T = TypeVar('T')
@@ -34,7 +30,7 @@ class VkDataLoader:
                           page: int | None = None,
                           limit: int | None = None,
                           ) -> list[FriendDataPretty]:
-        log_utils.log_start_loading_friends_data(user_id)
+        logs.utils.data_loaders_log.log_start_loading_friends_data(user_id)
 
         raw_response = self._request_friends_data(
             auth_token=auth_token,
@@ -49,7 +45,7 @@ class VkDataLoader:
             friends_data=validated_data.response.items
         )
 
-        log_utils.log_finish_loading_friends_data(
+        logs.utils.data_loaders_log.log_finish_loading_friends_data(
             user_id, friends_data_pretty,
         )
 
@@ -63,7 +59,7 @@ class VkDataLoader:
                               page: int | None = None,
                               limit: int | None = None,
                               ) -> Response:
-        log_utils.log_start_http_request(
+        logs.utils.data_loaders_log.log_start_http_request(
             url='https://api.vk.com/method/friends.get/'
         )
 
@@ -80,7 +76,7 @@ class VkDataLoader:
             headers={'Authorization': f'Bearer {auth_token}'},
         )
 
-        log_utils.log_finish_http_request(
+        logs.utils.data_loaders_log.log_finish_http_request(
             url='https://api.vk.com/method/friends.get/'
         )
 
@@ -89,28 +85,32 @@ class VkDataLoader:
     @staticmethod
     def _validate_response(response: Response,
                            ) -> ResponseWrapper | None:
-        log_utils.log_start_validating_response()
+        logs.utils.data_loaders_log.log_start_validating_response()
 
         if 'error' in (content := json.loads(response.content)):
             match content['error']['error_code']:
                 case 5:
-                    raise InvalidInput(
+                    raise InvalidInputError(
                         arg_name='auth_key',
                         expected_value_descr='valid vk authentication key',
                         log_error_descr='Invalid vk authentication key',
                     )
                 case 18:
-                    raise InvalidInput(
+                    raise InvalidInputError(
                         arg_name='user_id',
                         expected_value_descr='valid vk user id',
                         log_error_descr='Invalid vk user id'
                     )
                 case _:
-                    raise UnknownVkError()
+                    raise UnexpectedVkError()
+        try:
+            validated_data = ResponseWrapper.model_validate_json(response.content)
+        except pydantic_core.ValidationError as e:
+            raise pydantic_core.ValidationError(
+                f'Wrong vk response data structure: {e}'
+            )
 
-        validated_data = ResponseWrapper.model_validate_json(response.content)
-
-        log_utils.log_finish_validating_response()
+        logs.utils.data_loaders_log.log_finish_validating_response()
 
         return validated_data
 

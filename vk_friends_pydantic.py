@@ -13,8 +13,8 @@ class Response(BaseModel):
 
 
 class FriendData(BaseModel):
-    first_name: str | None
-    last_name: str | None
+    first_name: str | None = None
+    last_name: str | None = None
     country: 'Country | None' = None
     city: 'City | None' = None
     bdate: str | None = None

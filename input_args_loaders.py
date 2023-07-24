@@ -1,11 +1,10 @@
 import argparse
-import sys
 from abc import ABC, abstractmethod
 from typing import NamedTuple, Literal
-
 import common
-import log_utils
-from exceptions import InvalidInput
+import logs.utils.input_args_loaders_log
+import logs.utils.input_args_loaders_log
+from exceptions import InvalidInputError
 
 
 class InputArgs(NamedTuple):
@@ -28,11 +27,11 @@ class IInputArgsLoader(ABC):
 
 class TerminalArgsLoader(IInputArgsLoader):
     """ Loads input arguments from terminal """
-    log_utils.log_start_loading_terminal_args()
 
     def load(self) -> InputArgs:
-        parser = argparse.ArgumentParser()
+        logs.utils.input_args_loaders_log.log_start_loading_terminal_args()
 
+        parser = argparse.ArgumentParser()
         parser.add_argument(
             '-a', '--auth_token', type=str,
             help='Auth token for vk', required=True,
@@ -56,10 +55,9 @@ class TerminalArgsLoader(IInputArgsLoader):
             '-lim', '--limit', type=int,
             help='Quantity of rows in a single page (positive)'
         )
-
         filtered_args = self._filter_input_args(parser.parse_args())
 
-        log_utils.log_finish_loading_terminal_args()
+        logs.utils.input_args_loaders_log.log_finish_loading_terminal_args()
 
         return filtered_args
 
@@ -80,21 +78,21 @@ class TerminalArgsLoader(IInputArgsLoader):
     @staticmethod
     def _validate_input_args(input_args: argparse.Namespace,
                              ) -> None:
-        log_utils.log_start_validating_terminal_args()
+        logs.utils.input_args_loaders_log.log_start_validating_terminal_args()
 
         try:
             common.validate_positive_int_or_none(input_args.page)
         except (TypeError, ValueError):
-            raise InvalidInput(
+            raise InvalidInputError(
                 arg_name='page',
                 expected_value_descr='a positive integer',
             )
         try:
             common.validate_positive_int_or_none(input_args.limit)
         except (TypeError, ValueError):
-            raise InvalidInput(
+            raise InvalidInputError(
                 arg_name='limit',
                 expected_value_descr='a positive integer',
             )
 
-        log_utils.log_finish_validating_terminal_args()
+        logs.utils.input_args_loaders_log.log_finish_validating_terminal_args()
