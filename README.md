@@ -11,6 +11,8 @@ VK Friends Report Generator is a console application that generates a report con
    ```
    * -a / -auth_token (required argument) – access token
    * -uid / -user_id (optional argument) – user id
+   * -p / -output_path (optional argument, default: "report" in the working directory
+   * - f / -output_format (optional argument, default: "csv"
 
 ### How to get vk access token:
 1. Open https://vk.com/editapp?act=create
