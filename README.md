@@ -1,5 +1,5 @@
 # VK FRIENDS REPORT GENERATOR
-VK Friends Report Generator is a console application that generates a report consisting of your (or anyone's) friends' data and save it in one of the three formats (".csv", ".tsv", ".json")
+VK Friends Report Generator is a console application that generates a report consisting of your (or anyone else's) friends' data and save it in one of the three formats (".csv", ".tsv", ".json")
 
 
 
@@ -13,9 +13,10 @@ VK Friends Report Generator is a console application that generates a report con
 3. Open 'settings'
 4. Turn the app on
 5. Find App's ID and copy it
-6. Insert https://oauth.vk.com/authorize?client_id=[APP'S-ID]&redirect_uri=https://oauth.vk.com/blank.html&response_type=token&display=page into your browser's searchbar __(make sure to replace [APP'S-ID] with your app's id!!)__
-7. Authenticate if necessary
-8. Extract __access_token__ and __user_id__ values from the link in the searchbar
+6. Insert https://oauth.vk.com/authorize?client_id=[APP'S-ID]&redirect_uri=https://oauth.vk.com/blank.html&response_type=token&display=page into your browser's searchbar __(make sure to replace [APP'S-ID] with your app's id).__
+   You should get somethings like this https://oauth.vk.com/authorize?client_id=123456&redirect_uri=https://oauth.vk.com/blank.html&response_type=token&display=page
+8. Authenticate if necessary
+9. Extract __access_token__ and __user_id__ values from the link in the searchbar
 
 ### Example output:
 ...
