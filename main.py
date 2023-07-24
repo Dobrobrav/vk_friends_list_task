@@ -1,16 +1,19 @@
 import pydantic_core
 
-import logs.utils.for_main
-from utils import print_utils
-from utils.data_loaders import VkDataLoader
-from utils.exceptions import InvalidInputError, UnexpectedVkError
-from utils.input_args_loaders import TerminalArgsLoader
-from utils.savers import save_friends_data
+import sys
+from common import logger, UnexpectedVkError, InvalidInputError
+from data_loaders import VkDataLoader
+from input_args_loaders import TerminalArgsLoader
+from savers import save_friends_data
 
 
 def main():
-    logs.utils.for_main.log_started()
-    print_utils.print_started()
+    # if no args typed, ask to type the required arguments
+    if len(sys.argv) == 1:
+        print_inter_arguments()
+
+    log_started()
+    print_started()
 
     try:
         input_args = TerminalArgsLoader().load()
@@ -24,21 +27,87 @@ def main():
                           input_args.output_path,
                           input_args.output_format)
     except InvalidInputError as e:
-        print_utils.print_invalid_input(e)
-        logs.utils.for_main.log_invalid_input_error(e)
+        print_invalid_input(e)
+        log_invalid_input_error(e)
     except pydantic_core.ValidationError as e:
-        print_utils.print_pydantic_validation_error()
-        logs.utils.for_main.log_pydantic_validation_error(e)
+        print_pydantic_validation_error()
+        log_pydantic_validation_error(e)
 
     except UnexpectedVkError as e:
-        print_utils.print_unknown_vk_error()
-        logs.utils.for_main.log_unexpected_vk_error(e)
+        print_unknown_vk_error()
+        log_unexpected_vk_error(e)
     except Exception as e:
-        print_utils.print_unexpected_error(e)
-        logs.utils.for_main.log_unexpected_error(e)
+        print_unexpected_error(e)
+        log_unexpected_error(e)
     else:
-        print_utils.print_finished()
-        logs.utils.for_main.log_finished()
+        print_finished()
+        log_finished()
+
+
+# FRIENDLY PRINTING FUNCTIONS
+def print_inter_arguments():
+    print('Please type the required arguments: '
+          '-a [AUTH_TOKEN], -uid [USER_ID]')
+
+
+def print_started():
+    print("STARTED")
+
+
+def print_finished():
+    print('FINISHED!')
+
+
+def print_invalid_input(e: InvalidInputError,
+                        ) -> None:
+    print(f"Please type {e.expected_value_descr}"
+          f" for <{e.arg_name}> argument and try again")
+
+
+def print_pydantic_validation_error() -> None:
+    print(f"Vk response data structure is incorrect. "
+          f"Please try again later.")
+
+
+def print_unknown_vk_error() -> None:
+    print('Something went wrong with the request to vk.'
+          'Please check the arguments you typed and try again (maybe later)')
+
+
+def print_unexpected_error(e: Exception,
+                           ) -> None:
+    print(f'Something unexpected went wrong. Error message: {e}. '
+          f'Please check the input arguments and try again (maybe later)')
+
+
+# LOGGING FUNCTIONS
+
+def log_started():
+    logger.info('Program started')
+
+
+def log_finished():
+    logger.info("Program finished successfully")
+
+
+def log_invalid_input_error(e: InvalidInputError,
+                            ) -> None:
+    logger.error(e.log_error_descr)
+
+
+def log_pydantic_validation_error(e: pydantic_core.ValidationError,
+                                  ) -> None:
+    logger.error(str(e))
+
+
+def log_unexpected_vk_error(e: UnexpectedVkError,
+                            ) -> None:
+    logger.error(f"Unexpected vk error: {e}")
+
+
+def log_unexpected_error(e: Exception,
+                         ) -> None:
+    logger.error(f"Unexpected error: {e}")
 
 
 if __name__ == '__main__':

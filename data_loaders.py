@@ -1,14 +1,12 @@
 import json
 import pydantic_core
 import requests
-import logs.utils.for_data_loaders
 from datetime import datetime
 from typing import Literal, TypeVar
 from requests import Response
-from .common import FriendDataPretty
-from .exceptions import InvalidInputError, UnexpectedVkError
-from .vk_friends_pydantic import ResponseWrapper, FriendData, City, Country
-from logs.utils.common import logger
+
+import common
+from common import FriendDataPretty, InvalidInputError, UnexpectedVkError, FriendData, City, Country
 
 T = TypeVar('T')
 
@@ -30,7 +28,7 @@ class VkDataLoader:
                           page: int | None = None,
                           limit: int | None = None,
                           ) -> list[FriendDataPretty]:
-        logs.utils.for_data_loaders.log_start_loading_friends_data(user_id)
+        log_start_loading_friends_data(user_id)
 
         raw_response = self._request_friends_data(
             auth_token=auth_token,
@@ -45,7 +43,7 @@ class VkDataLoader:
             friends_data=validated_data.response.items
         )
 
-        logs.utils.for_data_loaders.log_finish_loading_friends_data(
+        log_finish_loading_friends_data(
             user_id, friends_data_pretty,
         )
 
@@ -59,7 +57,7 @@ class VkDataLoader:
                               page: int | None = None,
                               limit: int | None = None,
                               ) -> Response:
-        logs.utils.for_data_loaders.log_start_http_request(
+        log_start_http_request(
             url='https://api.vk.com/method/friends.get/'
         )
 
@@ -76,7 +74,7 @@ class VkDataLoader:
             headers={'Authorization': f'Bearer {auth_token}'},
         )
 
-        logs.utils.for_data_loaders.log_finish_http_request(
+        log_finish_http_request(
             url='https://api.vk.com/method/friends.get/'
         )
 
@@ -84,8 +82,8 @@ class VkDataLoader:
 
     @staticmethod
     def _validate_response(response: Response,
-                           ) -> ResponseWrapper | None:
-        logs.utils.for_data_loaders.log_start_validating_response()
+                           ) -> common.ResponseWrapper | None:
+        log_start_validating_response()
 
         if 'error' in (content := json.loads(response.content)):
             match content['error']['error_code']:
@@ -105,7 +103,7 @@ class VkDataLoader:
                     raise UnexpectedVkError()
 
         try:
-            validated_data = ResponseWrapper.model_validate_json(
+            validated_data = common.ResponseWrapper.model_validate_json(
                 response.content
             )
         except pydantic_core.ValidationError as e:
@@ -117,7 +115,7 @@ class VkDataLoader:
             print('No friends found. Either you don\'t have vk friends , '
                   'or the <page> or/and <limit> arguments are too high')
 
-        logs.utils.for_data_loaders.log_finish_validating_response()
+        log_finish_validating_response()
 
         return validated_data
 
@@ -200,3 +198,35 @@ class VkDataLoader:
             # if conversion fails, try the other format
             except ValueError:
                 continue
+
+
+# LOGGING FUNCTIONS
+def log_start_loading_friends_data(user_id: int,
+                                   ) -> None:
+    common.logger.info(f"Start loading friends data for {user_id}")
+
+
+def log_finish_loading_friends_data(user_id: int,
+                                    friends_data_pretty: list[FriendDataPretty],
+                                    ) -> None:
+    # common.logger.info(f"Finish loading friends log_files for {user_id}, "
+    #             f"log_files: {json.dumps(friends_data_pretty, ensure_ascii=False)}")
+    common.logger.info(f"Successfully finished loading friends data for  {user_id}")
+
+
+def log_start_validating_response():
+    common.logger.info(f"Start validating vk response")
+
+
+def log_finish_validating_response():
+    common.logger.info(f"Successfully validated vk response")
+
+
+def log_start_http_request(url: str,
+                           ) -> None:
+    common.logger.info(f"Start HTTP-request to {url}")
+
+
+def log_finish_http_request(url: str,
+                            ) -> None:
+    common.logger.info(f"Successfully got HTTP-response from {url}")
