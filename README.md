@@ -7,12 +7,15 @@ VK Friends Report Generator is a console application that generates a report con
 1. Clone the project into your IDE
 2. Type in terminal:
    ```console
-   python main.py -a [ACCESS_TOKEN] -uid [USER_ID] -p [OUTPUT_FILE_PATH] -f [OUTPUT_FILE_FORMAT] -l [LIMIT] -pg [PAGE]
+   python main.py -a [ACCESS_TOKEN] -uid [USER_ID] -p [OUTPUT_FILE_PATH] -f [OUTPUT_FILE_FORMAT] -pg [PAGE] -l [LIMIT]
    ```
-   * -a / -auth_token (required argument) – access token
-   * -uid / -user_id (optional argument) – user id
-   * -p / -output_path (optional argument, default: "report" in the working directory
-   * - f / -output_format (optional argument, default: "csv"
+   * -a / --auth_token (required argument) – access token
+   * -uid / --user_id (optional argument) – user id
+   * -p / --output_path (optional argument, default: "report" in the working directory) – path to save the report
+   * -f / --output_format (optional argument, default: "csv" – format of the report
+   * -pg / --page (optional argument, if None, then no pagination) – requested page
+   * -l / --limit (optional argument, default: 14, only works if _page_ is provided) – max page size
+     
 
 ### How to get vk access token:
 1. Open https://vk.com/editapp?act=create
