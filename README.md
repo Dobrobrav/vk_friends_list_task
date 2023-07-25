@@ -4,7 +4,7 @@ VK Friends Report Generator is a console application that generates a report con
 
 ## User instructions:
 1. Clone the project into your IDE
-2. Set up the dependencies by typing
+2. Set up the dependencies by typing in terminal
    ```console
    pip intall -r requirements.txt
    ```
