@@ -40,8 +40,14 @@ class InvalidInputError(Exception):
         self.log_error_descr = log_error_descr
 
 
+class ClosedVkProfileError(Exception):
+    pass
+
+
 class UnexpectedVkError(Exception):
     pass
+
+
 
 
 # PYDANTIC CLASSES

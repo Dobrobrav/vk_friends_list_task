@@ -34,7 +34,9 @@ def main():
     except pydantic_core.ValidationError as e:
         print_pydantic_validation_error()
         log_pydantic_validation_error(e)
-
+    except common.ClosedVkProfileError as e:
+        print_closed_vk_profile_error()
+        log_closed_vk_profile_error(e)
     except common.UnexpectedVkError as e:
         print_unknown_vk_error()
         log_unexpected_vk_error(e)
@@ -58,7 +60,7 @@ def print_started():
 
 
 def print_finished():
-    print('SUCCESSFUL!')
+    print('Program finished successfully :)')
 
 
 def print_invalid_input(e: common.InvalidInputError,
@@ -70,6 +72,10 @@ def print_invalid_input(e: common.InvalidInputError,
 def print_pydantic_validation_error() -> None:
     print(f"Vk response data structure is incorrect. "
           f"Please try again later.")
+
+
+def print_closed_vk_profile_error() -> None:
+    print(f"The profile is closed, so his friends' data can't be downloaded :(")
 
 
 def print_unknown_vk_error() -> None:
@@ -99,6 +105,11 @@ def log_invalid_input_error(e: common.InvalidInputError,
 
 def log_pydantic_validation_error(e: pydantic_core.ValidationError,
                                   ) -> None:
+    common.logger.error(str(e))
+
+
+def log_closed_vk_profile_error(e: common.ClosedVkProfileError,
+                                ) -> None:
     common.logger.error(str(e))
 
 

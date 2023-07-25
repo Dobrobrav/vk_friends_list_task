@@ -96,6 +96,8 @@ class VkDataLoader:
                         expected_value_descr='valid vk user id',
                         log_error_descr='Invalid vk user id'
                     )
+                case 30:
+                    raise common.ClosedVkProfileError
                 case _:
                     raise common.UnexpectedVkError()
 

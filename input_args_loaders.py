@@ -1,7 +1,6 @@
 import argparse
-import logging
 from abc import ABC, abstractmethod
-from typing import Optional, Literal, Collection, TypeVar
+from typing import Literal, Collection, TypeVar
 
 import common
 
@@ -54,8 +53,8 @@ class TerminalArgsLoader(IInputArgsLoader):
 
         return filtered_args
 
-    def _filter_input_args(self,
-                           input_args: argparse.Namespace,
+    @staticmethod
+    def _filter_input_args(input_args: argparse.Namespace,
                            ) -> common.InputArgs:
         return common.InputArgs(
             auth_token=input_args.auth_token,
@@ -132,7 +131,8 @@ class ConsoleArgsLoader(IInputArgsLoader):
             value_name='output format',
             is_empty_allowed=True,
             allowed_values=('csv', 'tsv', 'json'),
-            default_value='csv'
+            default_value='csv',
+            is_case_sensitive=False,
         )
         return input_value
 
@@ -158,31 +158,77 @@ class ConsoleArgsLoader(IInputArgsLoader):
                          input_type: type[T] = str,
                          allowed_values: Collection[T] | None = None,
                          default_value: T | None = None,
-                         ) -> int | str | None:
-        default_values_str = f' (default – {default_value})' if default_value else ''
-        is_optional_str = f'(OPTIONAL) ' if is_empty_allowed else '(REQUIRED) '
-        if allowed_values:
-            allowed_values_str = f" (allowed – {', '.join(tuple(allowed_values))})"
-        else:
-            allowed_values_str = ''
+                         is_case_sensitive: bool = True,
+                         ) -> T | None:
+        first_input_prompt = self._get_first_input_prompt(
+            allowed_values, default_value, is_empty_allowed, value_name
+        )
 
-        input_value = input(f"{is_optional_str}Please type {value_name}{default_values_str}{allowed_values_str}: ").strip()
-        if is_empty_allowed and input_value.strip() == '':
+        first_input_value = input(first_input_prompt).strip()
+
+        if is_empty_allowed and first_input_value.strip() == '':
             return default_value
 
+        input_value = self.ask_repeat_value_if_necessary(
+            is_empty_allowed, input_type, allowed_values,
+            is_case_sensitive, value_name, first_input_value,
+        )
+        return input_value
+
+    def _get_first_input_prompt(self,
+                                allowed_values: Collection[T],
+                                default_value: T,
+                                is_empty_allowed: bool,
+                                value_name: str,
+                                ) -> str:
+        default_value_str = self._get_default_value_str(default_value)
+        is_optional_str = self._get_is_optional_str(is_empty_allowed)
+        allowed_values_str = self._get_allowed_values_str(allowed_values)
+
+        res = f"{is_optional_str}Please type " \
+              f"{value_name}{default_value_str}{allowed_values_str}: "
+        return res
+
+    @staticmethod
+    def _get_default_value_str(default_value: str | int,
+                               ) -> str:
+        return f' (default – {default_value})' if default_value else ''
+
+    @staticmethod
+    def _get_is_optional_str(is_empty_allowed: bool,
+                             ) -> str:
+        return f'(OPTIONAL) ' if is_empty_allowed else '(REQUIRED) '
+
+    @staticmethod
+    def _get_allowed_values_str(allowed_values: Collection[int | str],
+                                ) -> str:
+        if allowed_values:
+            return f" (allowed – {', '.join(tuple(allowed_values))})"
+        else:
+            return ''
+
+    def ask_repeat_value_if_necessary(self,
+                                      is_empty_allowed: bool,
+                                      input_type: type[T],
+                                      allowed_values: Collection[T],
+                                      is_case_sensitive: bool,
+                                      value_name: str,
+                                      first_input_value: str,
+                                      ):
         while True:
             try:
-                if not is_empty_allowed and input_value == '':
+                if not is_empty_allowed and first_input_value == '':
                     raise ValueError()
                 if input_type is not str:
-                    self._validate_type(input_value, expected_type=input_type)
+                    self._validate_type(first_input_value,
+                                        expected_type=input_type)
                 if allowed_values:
                     self._validate_for_allowed_values(
-                        input_value, allowed_values
+                        first_input_value, allowed_values, is_case_sensitive
                     )
-                return input_value
+                return first_input_value
             except (TypeError, ValueError):
-                input_value = input(
+                first_input_value = input(
                     f"Please, make sure, {value_name} "
                     f"is {input_type.__name__} and type it again: "
                 )
@@ -200,7 +246,11 @@ class ConsoleArgsLoader(IInputArgsLoader):
     @staticmethod
     def _validate_for_allowed_values(input_value: T,
                                      allowed_values: Collection[T],
+                                     case_sensitive: bool,
                                      ) -> None:
+        if isinstance(input_value, str):
+            input_value = input_value if case_sensitive else input_value.lower()
+
         if input_value not in allowed_values:
             raise ValueError()
 
