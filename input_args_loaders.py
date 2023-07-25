@@ -166,13 +166,14 @@ class ConsoleArgsLoader(IInputArgsLoader):
         else:
             allowed_values_str = ''
 
-        input_value = input(f"{is_optional_str}Please type {value_name}{default_values_str}{allowed_values_str}: ")
+        input_value = input(f"{is_optional_str}Please type {value_name}{default_values_str}{allowed_values_str}: ").strip()
         if is_empty_allowed and input_value.strip() == '':
             return default_value
 
         while True:
             try:
-                # input can always be converted to str, because it is str
+                if not is_empty_allowed and input_value == '':
+                    raise ValueError()
                 if input_type is not str:
                     self._validate_type(input_value, expected_type=input_type)
                 if allowed_values:

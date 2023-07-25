@@ -8,22 +8,32 @@ VK Friends Report Generator is a console application that generates a report con
    ```console
    pip intall -r requirements.txt
    ```
-4. Type in terminal:
+3. Two ways:
+<br/>
+   3.1. Type in terminal
+     ```console
+     python main.py -a [ACCESS_TOKEN] -uid [USER_ID] -p [OUTPUT_FILE_PATH] -f [OUTPUT_FILE_FORMAT] -pg [PAGE] -l [LIMIT]
+     ```
+      * -a / --auth_token (required argument) – access token [(how to get access token)](#get-access-token)
+      * -uid / --user_id (optional argument) – user id
+      * -p / --output_path (optional argument, default: "report" in the working directory) – path to save the report
+      * -f / --output_format (optional argument, default: "csv" – format of the report
+      * -pg / --page (optional argument, if None, then no pagination) – requested page
+      * -l / --limit (optional argument, default: 14, only works if _page_ is provided) – max page size
+   
+      <h4 align='center'>OR</h4>
+   
+   3.1. Type in terminal:
    ```console
-   python main.py -a [ACCESS_TOKEN] -uid [USER_ID] -p [OUTPUT_FILE_PATH] -f [OUTPUT_FILE_FORMAT] -pg [PAGE] -l [LIMIT]
-   ```
-   * -a / --auth_token (required argument) – access token [(how to get access token)](#get-access-token)
-   * -uid / --user_id (optional argument) – user id
-   * -p / --output_path (optional argument, default: "report" in the working directory) – path to save the report
-   * -f / --output_format (optional argument, default: "csv" – format of the report
-   * -pg / --page (optional argument, if None, then no pagination) – requested page
-   * -l / --limit (optional argument, default: 14, only works if _page_ is provided) – max page size
-  <br/><br/>
-  
-   #### Example input
-   ```console
-   python main.py -a vk1.a.m7VxRgYSK8UgTc1VXFdEFdFviqalIoQL2ljBAuFrVpzeyODYKOLqrG6UYod7NzMnmqYcFzv4RY2rZwiHY5X6WEyJg32v7Xo2QNae8lJgiuOgSAOzuGng8Az77eDfSRJvlQZrddlFFusfJVzCVQotvzV5vpjjRPju1VMWIzGdH8qRr_PxPe9mXP3k672Wwaqtugru2kZb67WTgt9PUD8DqQ -p res -f json -l 12 -pg 5
-   ```   
+      python main.py   
+   ```      
+   3.2. Follow instructions in console
+<br/><br/>
+
+  #### Example input
+  ```console
+  python main.py -a vk1.a.m7VxRgYSK8UgTc1VXFdEFdFviqalIoQL2ljBAuFrVpzeyODYKOLqrG6UYod7NzMnmqYcFzv4RY2rZwiHY5X6WEyJg32v7Xo2QNae8lJgiuOgSAOzuGng8Az77eDfSRJvlQZrddlFFusfJVzCVQotvzV5vpjjRPju1VMWIzGdH8qRr_PxPe9mXP3k672Wwaqtugru2kZb67WTgt9PUD8DqQ -p res -f json -l 12 -pg 5
+  ```   
 <br/><br/>
 
 ## How to get vk access token: <a name='get-access-token'></a>

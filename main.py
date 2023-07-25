@@ -53,7 +53,8 @@ def print_inter_arguments():
 
 
 def print_started():
-    print("STARTED")
+    print("Welcome!")
+    print("Here you can download list of your friends... (add description)")
 
 
 def print_finished():
@@ -72,7 +73,7 @@ def print_pydantic_validation_error() -> None:
 
 
 def print_unknown_vk_error() -> None:
-    print('Something went wrong with the request to vk.'
+    print('Something went wrong with the request to vk. '
           'Please check the arguments you typed and try again (maybe later)')
 
 
