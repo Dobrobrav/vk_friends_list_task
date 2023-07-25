@@ -1,3 +1,4 @@
+import sys
 from typing import TypeAlias, Literal, NamedTuple
 from pydantic import BaseModel
 from loguru import logger
@@ -16,8 +17,8 @@ logger.add(f"logs/{today_date}.log", rotation="1 day", level='DEBUG')
 class InputArgs(NamedTuple):
     auth_token: str
     user_id: int | None
-    output_format: Literal['csv', 'tsv', 'json']
     output_path: str
+    output_format: Literal['csv', 'tsv', 'json']
     page: int | None
     limit: int | None
 
@@ -72,6 +73,13 @@ class Country(BaseModel):
 
 
 # FUNCTIONS
+def is_any_argv_typed():
+    """ Checks if any arguments were added after "python main.py" in terminal """
+    if len(sys.argv) == 1:
+        return False
+    return True
+
+
 def validate_positive_int_or_none(value: int | None,
                                   ) -> None:
     is_not_none_nor_int = value is not None and type(value) is not int

@@ -1,6 +1,11 @@
 import argparse
+import logging
 from abc import ABC, abstractmethod
+from typing import Optional, Literal, Collection, TypeVar
+
 import common
+
+T = TypeVar('T')
 
 
 class IInputArgsLoader(ABC):
@@ -27,12 +32,12 @@ class TerminalArgsLoader(IInputArgsLoader):
             '-uid', '--user_id', type=int, help='Vk user id',
         )
         parser.add_argument(
-            '-f', '--output_format', type=str, help='Output file format',
-            default='csv', choices=self._ALLOWED_OUTPUT_FORMATS,
-        )
-        parser.add_argument(
             '-p', '--output_path', type=str,
             help='Output file path', default='report',
+        )
+        parser.add_argument(
+            '-f', '--output_format', type=str, help='Output file format',
+            default='csv', choices=self._ALLOWED_OUTPUT_FORMATS,
         )
         parser.add_argument(
             '-pg', '--page', type=int, help='Number of page'
@@ -84,6 +89,119 @@ class TerminalArgsLoader(IInputArgsLoader):
             )
 
         log_finish_validating_terminal_args()
+
+
+class ConsoleArgsLoader(IInputArgsLoader):
+
+    def load(self):
+        input_args = common.InputArgs(
+            auth_token=self._get_access_token(),
+            user_id=self._get_user_id(),
+            output_path=self._get_output_path(),
+            output_format=self._get_output_format(),
+            page=self._get_page(),
+            limit=self._get_limit(),
+        )
+        return input_args
+
+    def _get_access_token(self) -> str:
+        input_value = self._ask_input_value(
+            value_name='access token',
+            is_empty_allowed=False,
+        )
+        return input_value
+
+    def _get_user_id(self) -> int | None:
+        input_value = self._ask_input_value(
+            value_name='user id',
+            input_type=int,
+            is_empty_allowed=True,
+        )
+        return input_value
+
+    def _get_output_path(self) -> str:
+        input_value = self._ask_input_value(
+            value_name='output path',
+            is_empty_allowed=True,
+            default_value='report',
+        )
+        return input_value
+
+    def _get_output_format(self) -> Literal['csv', 'tsv', 'json']:
+        input_value = self._ask_input_value(
+            value_name='output format',
+            is_empty_allowed=True,
+            allowed_values=('csv', 'tsv', 'json'),
+            default_value='csv'
+        )
+        return input_value
+
+    def _get_page(self) -> int | None:
+        input_value = self._ask_input_value(
+            value_name='page',
+            input_type=int,
+            is_empty_allowed=True,
+        )
+        return input_value
+
+    def _get_limit(self) -> int | None:
+        input_value = self._ask_input_value(
+            value_name='max number of friends on a page',
+            input_type=int,
+            is_empty_allowed=True,
+        )
+        return input_value
+
+    def _ask_input_value(self,
+                         value_name: str,
+                         is_empty_allowed: bool,
+                         input_type: type[T] = str,
+                         allowed_values: Collection[T] | None = None,
+                         default_value: T | None = None,
+                         ) -> int | str | None:
+        default_values_str = f' (default – {default_value})' if default_value else ''
+        is_optional_str = f'(OPTIONAL) ' if is_empty_allowed else '(REQUIRED) '
+        if allowed_values:
+            allowed_values_str = f" (allowed – {', '.join(tuple(allowed_values))})"
+        else:
+            allowed_values_str = ''
+
+        input_value = input(f"{is_optional_str}Please type {value_name}{default_values_str}{allowed_values_str}: ")
+        if is_empty_allowed and input_value.strip() == '':
+            return default_value
+
+        while True:
+            try:
+                # input can always be converted to str, because it is str
+                if input_type is not str:
+                    self._validate_type(input_value, expected_type=input_type)
+                if allowed_values:
+                    self._validate_for_allowed_values(
+                        input_value, allowed_values
+                    )
+                return input_value
+            except (TypeError, ValueError):
+                input_value = input(
+                    f"Please, make sure, {value_name} "
+                    f"is {input_type.__name__} and type it again: "
+                )
+                continue
+
+    @staticmethod
+    def _validate_type(value: str,
+                       expected_type: type,
+                       ) -> None:
+        try:
+            expected_type(value)
+        except ValueError:
+            raise TypeError()
+
+    @staticmethod
+    def _validate_for_allowed_values(input_value: T,
+                                     allowed_values: Collection[T],
+                                     ) -> None:
+        if input_value not in allowed_values:
+            raise ValueError()
 
 
 # LOGGING FUNCTIONS

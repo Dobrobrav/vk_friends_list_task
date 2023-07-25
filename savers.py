@@ -71,7 +71,7 @@ class JSONSaver(ISaver, LocalStorageSaverMixin):
         log_finish_saving(self._output_path, 'json')
 
 
-def save_friends_data(friends: Sequence[common.FriendDataPretty],
+def save_friends_data(friends_data: Sequence[common.FriendDataPretty],
                       output_path: str,
                       output_format: Literal['csv', 'tsv', 'json'],
                       ) -> None:
@@ -85,7 +85,7 @@ def save_friends_data(friends: Sequence[common.FriendDataPretty],
         case _:
             raise ValueError('the format must be one of the allowed')
 
-    saver.save(friends)
+    saver.save(friends_data)
 
 
 # LOGGING FUNCTIONS

@@ -1,6 +1,4 @@
 import pydantic_core
-
-import sys
 import common
 import input_args_loaders
 import savers
@@ -8,24 +6,28 @@ import data_loaders
 
 
 def main():
-    # if no args typed, ask to type the required arguments
-    if len(sys.argv) == 1:
-        print_inter_arguments()
-
     log_started()
     print_started()
 
     try:
-        input_args = input_args_loaders.TerminalArgsLoader().load()
+        # if no args typed, use friendly interface
+        if common.is_any_argv_typed():
+            input_args = input_args_loaders.TerminalArgsLoader().load()
+        else:
+            input_args = input_args_loaders.ConsoleArgsLoader().load()
+
         friends_data = data_loaders.VkDataLoader().load_friends_data(
             user_id=input_args.user_id,
             auth_token=input_args.auth_token,
             page=input_args.page,
             limit=input_args.limit,
         )
-        savers.save_friends_data(friends_data,
-                                 input_args.output_path,
-                                 input_args.output_format)
+        savers.save_friends_data(
+            friends_data=friends_data,
+            output_path=input_args.output_path,
+            output_format=input_args.output_format,
+        )
+
     except common.InvalidInputError as e:
         print_invalid_input(e)
         log_invalid_input_error(e)
@@ -55,7 +57,7 @@ def print_started():
 
 
 def print_finished():
-    print('FINISHED!')
+    print('SUCCESSFUL!')
 
 
 def print_invalid_input(e: common.InvalidInputError,

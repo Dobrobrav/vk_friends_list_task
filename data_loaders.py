@@ -86,9 +86,9 @@ class VkDataLoader:
             match content['error']['error_code']:
                 case 5:
                     raise common.InvalidInputError(
-                        arg_name='auth_key',
-                        expected_value_descr='valid vk authentication key',
-                        log_error_descr='Invalid vk authentication key',
+                        arg_name='access_token',
+                        expected_value_descr='valid vk access token',
+                        log_error_descr='Invalid vk access token',
                     )
                 case 18:
                     raise common.InvalidInputError(
