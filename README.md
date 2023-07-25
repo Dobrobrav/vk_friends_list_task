@@ -1,7 +1,6 @@
 # VK FRIENDS REPORT GENERATOR
 VK Friends Report Generator is a console application that generates a report consisting of your (or anyone else's) friends' data and save it in one of the three formats (".csv", ".tsv", ".json")
-
-
+<br/><br/>
 
 ## User instructions:
 1. Clone the project into your IDE
@@ -19,12 +18,13 @@ VK Friends Report Generator is a console application that generates a report con
    * -f / --output_format (optional argument, default: "csv" – format of the report
    * -pg / --page (optional argument, if None, then no pagination) – requested page
    * -l / --limit (optional argument, default: 14, only works if _page_ is provided) – max page size
+  <br/><br/>
   
    #### Example input
    ```console
    python main.py -a vk1.a.m7VxRgYSK8UgTc1VXFdEFdFviqalIoQL2ljBAuFrVpzeyODYKOLqrG6UYod7NzMnmqYcFzv4RY2rZwiHY5X6WEyJg32v7Xo2QNae8lJgiuOgSAOzuGng8Az77eDfSRJvlQZrddlFFusfJVzCVQotvzV5vpjjRPju1VMWIzGdH8qRr_PxPe9mXP3k672Wwaqtugru2kZb67WTgt9PUD8DqQ -p res -f json -l 12 -pg 5
    ```   
-     
+<br/><br/>
 
 ## How to get vk access token: <a name='get-access-token'></a>
 1. Open https://vk.com/editapp?act=create
@@ -37,10 +37,11 @@ VK Friends Report Generator is a console application that generates a report con
    You should get somethings like this https://oauth.vk.com/authorize?client_id=123456&redirect_uri=https://oauth.vk.com/blank.html&response_type=token&display=page
 8. Authenticate if necessary
 9. Extract __access_token__ and __user_id__ values from the link in the searchbar
+<br/><br/>
 
 ## Example output:
 ...
-
+<br/><br/>
 
 ## How the script works:
 1. Script scans and parces console input (access token, user id, output path, etc) into python variables
@@ -49,7 +50,7 @@ VK Friends Report Generator is a console application that generates a report con
 4. Script validates the response json structure (using pydantic) and raises exceptions, if structure is incorrect
 5. Script saves report in provided output path and format.
 * Script loggs all the main events
-
+<br/><br/>
 
 ## Used API endpoints:
 This app uses the VK API endpoint https://api.vk.com/method/friends.get/ for getting friends list of a vk user.
