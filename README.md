@@ -42,8 +42,13 @@ VK Friends Report Generator is a console application that generates a report con
 ...
 
 
-### How the app works:
-...
+### How the script works:
+1. Script scans and parces console input (access token, user id, output path, etc) into python variables
+2. Script sends the HTTP-request to VK API for getting friends list, using the input data
+3. Script validates the response for vk errors (invalid access token, invalid user id and others) and  raises Exceptions, if there are errors
+4. Script validates the response json structure (using pydantic) and raises exceptions, if structure is incorrect
+5. Script saves report in provided output path and format.
+* Script loggs all the main events
 
 
 ### Used API endpoints:
