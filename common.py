@@ -1,18 +1,8 @@
-import os
 import sys
 from typing import TypeAlias, Literal, NamedTuple
 from pydantic import BaseModel
-from loguru import logger
-import datetime
 
 FriendDataPretty: TypeAlias = dict[str, str | int]  # russian titles and other
-
-# remove default loguru handler to stop logs to terminal
-logger.remove()
-
-# set up logger to logs to file
-today_date = datetime.date.today()
-logger.add(f"logs/{today_date}.log", rotation="1 day", level='DEBUG')
 
 
 class InputArgs(NamedTuple):
@@ -46,8 +36,6 @@ class ClosedVkProfileError(Exception):
 
 class UnexpectedVkError(Exception):
     pass
-
-
 
 
 # PYDANTIC CLASSES

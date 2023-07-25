@@ -4,6 +4,7 @@ import tsv
 from abc import ABC, abstractmethod
 from typing import Sequence, Literal
 import common
+import log_utils
 
 
 class ISaver(ABC):
@@ -29,7 +30,7 @@ class CSVSaver(ISaver, LocalStorageSaverMixin):
     def save(self,
              friends: Sequence[common.FriendDataPretty],
              ) -> None:
-        log_start_saving(self._output_path, 'csv')
+        log_utils.log_start_saving(self._output_path, 'csv')
 
         with open(f'{self._output_path}.csv', mode='w',
                   encoding='utf-8', newline='') as file:
@@ -37,7 +38,7 @@ class CSVSaver(ISaver, LocalStorageSaverMixin):
             writer.writeheader()
             writer.writerows(friends)
 
-        log_finish_saving(self._output_path, 'csv')
+        log_utils.log_finish_saving(self._output_path, 'csv')
 
 
 class TSVSaver(ISaver, LocalStorageSaverMixin):
@@ -45,7 +46,7 @@ class TSVSaver(ISaver, LocalStorageSaverMixin):
     def save(self,
              friends: Sequence[common.FriendDataPretty],
              ) -> None:
-        log_start_saving(self._output_path, 'tsv')
+        log_utils.log_start_saving(self._output_path, 'tsv')
 
         with open(f'{self._output_path}.tsv', mode='w',
                   encoding='utf-8', newline='') as file:
@@ -54,7 +55,7 @@ class TSVSaver(ISaver, LocalStorageSaverMixin):
             for friend in friends:
                 writer.line(*friend.values())
 
-        log_finish_saving(self._output_path, 'tsv')
+        log_utils.log_finish_saving(self._output_path, 'tsv')
 
 
 class JSONSaver(ISaver, LocalStorageSaverMixin):
@@ -62,13 +63,13 @@ class JSONSaver(ISaver, LocalStorageSaverMixin):
     def save(self,
              friends: Sequence[common.FriendDataPretty],
              ) -> None:
-        log_start_saving(self._output_path, 'json')
+        log_utils.log_start_saving(self._output_path, 'json')
 
         with open(f'{self._output_path}.json', mode='w',
                   encoding='utf-8', newline='') as file:
             json.dump(friends, fp=file, ensure_ascii=False)
 
-        log_finish_saving(self._output_path, 'json')
+        log_utils.log_finish_saving(self._output_path, 'json')
 
 
 def save_friends_data(friends_data: Sequence[common.FriendDataPretty],
@@ -86,18 +87,3 @@ def save_friends_data(friends_data: Sequence[common.FriendDataPretty],
             raise ValueError('the format must be one of the allowed')
 
     saver.save(friends_data)
-
-
-# LOGGING FUNCTIONS
-def log_start_saving(output_path: str,
-                     output_format: str,
-                     ) -> None:
-    common.logger.info(f"Start saving data to {output_format.upper()} "
-                       f"{output_path}.{output_format} file")
-
-
-def log_finish_saving(output_path: str,
-                      output_format: str,
-                      ) -> None:
-    common.logger.info(f"Successfully saved data to {output_format.upper()} "
-                       f"{output_path}.{output_format} file")
