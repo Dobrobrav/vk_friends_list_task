@@ -52,7 +52,7 @@ VK Friends Report Generator is a console application that generates a report con
 
 
 ## Used API endpoints:
-This app uses the vk API endpoint https://api.vk.com/method/friends.get/ for getting friends list of a vk user.
+This app uses the VK API endpoint https://api.vk.com/method/friends.get/ for getting friends list of a vk user.
 #### Params:
  * access_token - token for accessing vk user data
  * user_id - id of a vk user
@@ -60,5 +60,5 @@ This app uses the vk API endpoint https://api.vk.com/method/friends.get/ for get
  * count - maximum quantity of friends. Used for pagination
  * offset - how many friends to skip. Also used for pagination
  * fields - list of extra fields to be returned. "bdate, city, country, sex" value is used in the app to get birthday, city, country and sex information about each friend.
- * v - version of vk API. "5.131" is used
+ * v - version of VK API. "5.131" is used
 
