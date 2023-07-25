@@ -6,7 +6,6 @@ from typing import Literal, TypeVar
 from requests import Response
 
 import common
-from common import FriendDataPretty, InvalidInputError, UnexpectedVkError, FriendData, City, Country
 
 T = TypeVar('T')
 
@@ -27,7 +26,7 @@ class VkDataLoader:
                           fields: str = 'bdate, city, country, sex',
                           page: int | None = None,
                           limit: int | None = None,
-                          ) -> list[FriendDataPretty]:
+                          ) -> list[common.FriendDataPretty]:
         log_start_loading_friends_data(user_id)
 
         raw_response = self._request_friends_data(
@@ -43,9 +42,7 @@ class VkDataLoader:
             friends_data=validated_data.response.items
         )
 
-        log_finish_loading_friends_data(
-            user_id, friends_data_pretty,
-        )
+        log_finish_loading_friends_data(user_id)
 
         return friends_data_pretty
 
@@ -88,19 +85,19 @@ class VkDataLoader:
         if 'error' in (content := json.loads(response.content)):
             match content['error']['error_code']:
                 case 5:
-                    raise InvalidInputError(
+                    raise common.InvalidInputError(
                         arg_name='auth_key',
                         expected_value_descr='valid vk authentication key',
                         log_error_descr='Invalid vk authentication key',
                     )
                 case 18:
-                    raise InvalidInputError(
+                    raise common.InvalidInputError(
                         arg_name='user_id',
                         expected_value_descr='valid vk user id',
                         log_error_descr='Invalid vk user id'
                     )
                 case _:
-                    raise UnexpectedVkError()
+                    raise common.UnexpectedVkError()
 
         try:
             validated_data = common.ResponseWrapper.model_validate_json(
@@ -137,8 +134,8 @@ class VkDataLoader:
             return limit
 
     def _convert_friends_data_to_pretty(self,
-                                        friends_data: list[FriendData],
-                                        ) -> list[FriendDataPretty]:
+                                        friends_data: list[common.FriendData],
+                                        ) -> list[common.FriendDataPretty]:
         res = [
             {
                 'Имя': self._get_value_or_empty(friend_data.first_name),
@@ -157,7 +154,7 @@ class VkDataLoader:
         return res
 
     def _get_gender(self,
-                    friend: FriendData,
+                    friend: common.FriendData,
                     ) -> Literal['мужской', 'женский', 'не указано']:
         vk_format_gender = self._get_value_or_empty(friend.sex)
         if vk_format_gender is None:
@@ -171,12 +168,13 @@ class VkDataLoader:
         return value or 'не указано'
 
     @staticmethod
-    def _get_field_or_empty_from_nested(nested_value: City | Country,
-                                        ) -> str:
+    def _get_field_or_empty_from_nested(
+            nested_value: common.City | common.Country,
+    ) -> str:
         return 'не указано' if nested_value is None else nested_value.title
 
     def _get_birthdate(self,
-                       friend: FriendData,
+                       friend: common.FriendData,
                        ) -> str:
         raw_birthdate = self._get_value_or_empty(friend.bdate)
         if raw_birthdate == 'не указано':
@@ -207,11 +205,8 @@ def log_start_loading_friends_data(user_id: int,
 
 
 def log_finish_loading_friends_data(user_id: int,
-                                    friends_data_pretty: list[FriendDataPretty],
                                     ) -> None:
-    # common.logger.info(f"Finish loading friends log_files for {user_id}, "
-    #             f"log_files: {json.dumps(friends_data_pretty, ensure_ascii=False)}")
-    common.logger.info(f"Successfully finished loading friends data for  {user_id}")
+    common.logger.info(f"Successfully finished loading friends data for {user_id}")
 
 
 def log_start_validating_response():

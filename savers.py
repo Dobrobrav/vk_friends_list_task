@@ -3,7 +3,6 @@ import json
 import tsv
 from abc import ABC, abstractmethod
 from typing import Sequence, Literal
-
 import common
 
 
