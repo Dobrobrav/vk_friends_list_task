@@ -3,7 +3,7 @@ VK Friends Report Generator is a console application that generates a report con
 
 
 
-### User instructions:
+## User instructions:
 1. Clone the project into your IDE
 2. Set up the dependencies by typing
    ```console
@@ -26,7 +26,7 @@ VK Friends Report Generator is a console application that generates a report con
    ```   
      
 
-### How to get vk access token:
+## How to get vk access token:
 1. Open https://vk.com/editapp?act=create
 2. Create a standalone app
 3. Open "settings"
@@ -38,11 +38,11 @@ VK Friends Report Generator is a console application that generates a report con
 8. Authenticate if necessary
 9. Extract __access_token__ and __user_id__ values from the link in the searchbar
 
-### Example output:
+## Example output:
 ...
 
 
-### How the script works:
+## How the script works:
 1. Script scans and parces console input (access token, user id, output path, etc) into python variables
 2. Script sends the HTTP-request to VK API for getting friends list, using the input data
 3. Script validates the response for vk errors (invalid access token, invalid user id and others) and  raises Exceptions, if there are errors
@@ -51,7 +51,7 @@ VK Friends Report Generator is a console application that generates a report con
 * Script loggs all the main events
 
 
-### Used API endpoints:
+## Used API endpoints:
 This app uses the vk API endpoint https://api.vk.com/method/friends.get/ for getting friends list of a vk user.
 #### Params:
  * access_token - token for accessing vk user data
