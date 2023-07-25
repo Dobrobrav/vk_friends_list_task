@@ -13,7 +13,7 @@ class IInputArgsLoader(ABC):
 
 
 class TerminalArgsLoader(IInputArgsLoader):
-    """ Loads input arguments from terminal """
+    """ Loads argv arguments from terminal after "python main.py" """
 
     def load(self) -> common.InputArgs:
         log_start_loading_terminal_args()
