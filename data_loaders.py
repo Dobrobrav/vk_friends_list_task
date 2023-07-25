@@ -5,6 +5,7 @@ from datetime import datetime
 from typing import Literal, TypeVar
 
 import common
+import log_utils
 
 T = TypeVar('T')
 
@@ -26,7 +27,7 @@ class VkDataLoader:
                           page: int | None = None,
                           limit: int | None = None,
                           ) -> list[common.FriendDataPretty]:
-        log_start_loading_friends_data(user_id)
+        log_utils.log_start_loading_friends_data(user_id)
 
         raw_response = self._request_friends_data(
             auth_token=access_token,
@@ -41,7 +42,7 @@ class VkDataLoader:
             friends_data=validated_data.response.items
         )
 
-        log_finish_loading_friends_data(user_id)
+        log_utils.log_finish_loading_friends_data(user_id)
 
         return friends_data_pretty
 
@@ -53,7 +54,7 @@ class VkDataLoader:
                               page: int | None = None,
                               limit: int | None = None,
                               ) -> requests.Response:
-        log_start_http_request(
+        log_utils.log_start_http_request(
             url='https://api.vk.com/method/friends.get/'
         )
 
@@ -70,7 +71,7 @@ class VkDataLoader:
             headers={'Authorization': f'Bearer {auth_token}'},
         )
 
-        log_finish_http_request(
+        log_utils.log_finish_http_request(
             url='https://api.vk.com/method/friends.get/'
         )
 
@@ -79,7 +80,7 @@ class VkDataLoader:
     @staticmethod
     def _validate_response(response: requests.Response,
                            ) -> common.ResponseWrapper | None:
-        log_start_validating_response()
+        log_utils.log_start_validating_response()
 
         if 'error' in (content := json.loads(response.content)):
             #
@@ -112,7 +113,7 @@ class VkDataLoader:
             print('No friends found. Either you don\'t have vk friends , '
                   'or the <page> or/and <limit> arguments are too high')
 
-        log_finish_validating_response()
+        log_utils.log_finish_validating_response()
 
         return validated_data
 
@@ -196,32 +197,3 @@ class VkDataLoader:
             # if conversion fails, try the other format
             except ValueError:
                 continue
-
-
-# LOGGING FUNCTIONS
-def log_start_loading_friends_data(user_id: int,
-                                   ) -> None:
-    common.logger.info(f"Start loading friends data for {user_id}")
-
-
-def log_finish_loading_friends_data(user_id: int,
-                                    ) -> None:
-    common.logger.info(f"Successfully finished loading friends data for {user_id}")
-
-
-def log_start_validating_response():
-    common.logger.info(f"Start validating vk response")
-
-
-def log_finish_validating_response():
-    common.logger.info(f"Successfully validated vk response")
-
-
-def log_start_http_request(url: str,
-                           ) -> None:
-    common.logger.info(f"Start HTTP-request to {url}")
-
-
-def log_finish_http_request(url: str,
-                            ) -> None:
-    common.logger.info(f"Successfully got HTTP-response from {url}")

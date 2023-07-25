@@ -18,6 +18,7 @@ def vk_data_loader():
         # Test case 1: everything valid
         (12345, 'some-valid-token', 'name', 'bdate, city, country, sex', None, None,
          data.VALID_RESPONSE, data.VALID_RESULT)
+
         # other test cases ...
     ]
 )
@@ -55,7 +56,7 @@ def test_load_friends_data(vk_data_loader: data_loaders.VkDataLoader,
         (34562, 'some-valid-token', 'name', 'bdate, city, country, sex', None, None,
          data.INVALID_STRUCTURE_RESPONSE, pydantic_core.ValidationError),
 
-        # Test case 5: everything is valid, unknown number of 'error' field in vk response
+        # Test case 5: everything is valid, unknown value of 'error' field in vk response
         (34562, 'some-valid-token', 'name', 'bdate, city, country, sex', None, None,
          data.UNKNOWN_ERROR_CODE_RESPONSE, common.UnexpectedVkError),
     ]
@@ -63,6 +64,7 @@ def test_load_friends_data(vk_data_loader: data_loaders.VkDataLoader,
 def test_load_friends_data_errors(vk_data_loader: data_loaders.VkDataLoader,
                                   user_id, access_token, order, fields, page,
                                   limit, response_data, expected_error) -> None:
+    # mocking the '_request_friends_data' func, which accesses VK API
     vk_data_loader._request_friends_data = (
         lambda auth_token, user_id, order, fields, page, limit: response_data
     )

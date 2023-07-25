@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from typing import Literal, Collection, TypeVar
 
 import common
+import log_utils
 
 T = TypeVar('T')
 
@@ -20,7 +21,7 @@ class TerminalArgsLoader(IInputArgsLoader):
     """ Loads argv arguments from terminal after "python main.py" """
 
     def load(self) -> common.InputArgs:
-        log_start_loading_terminal_args()
+        log_utils.log_start_loading_terminal_args()
 
         parser = argparse.ArgumentParser()
         parser.add_argument(
@@ -49,7 +50,7 @@ class TerminalArgsLoader(IInputArgsLoader):
         self._validate_input_args(args)
         filtered_args = self._filter_input_args(args)
 
-        log_finish_loading_terminal_args()
+        log_utils.log_finish_loading_terminal_args()
 
         return filtered_args
 
@@ -68,7 +69,7 @@ class TerminalArgsLoader(IInputArgsLoader):
     @staticmethod
     def _validate_input_args(input_args: argparse.Namespace,
                              ) -> None:
-        log_start_validating_terminal_args()
+        log_utils.log_start_validating_terminal_args()
 
         try:
             common.validate_positive_int_or_none(input_args.page)
@@ -87,7 +88,7 @@ class TerminalArgsLoader(IInputArgsLoader):
                 log_error_descr='Invalid limit value',
             )
 
-        log_finish_validating_terminal_args()
+        log_utils.log_finish_validating_terminal_args()
 
 
 class ConsoleArgsLoader(IInputArgsLoader):
@@ -105,14 +106,14 @@ class ConsoleArgsLoader(IInputArgsLoader):
         return input_args
 
     def _get_access_token(self) -> str:
-        input_value = self._ask_input_value(
+        input_value = self._get_input_value(
             value_name='access token',
             is_empty_allowed=False,
         )
         return input_value
 
     def _get_user_id(self) -> int | None:
-        input_value = self._ask_input_value(
+        input_value = self._get_input_value(
             value_name='user id',
             input_type=int,
             is_empty_allowed=True,
@@ -120,7 +121,7 @@ class ConsoleArgsLoader(IInputArgsLoader):
         return input_value
 
     def _get_output_path(self) -> str:
-        input_value = self._ask_input_value(
+        input_value = self._get_input_value(
             value_name='output path',
             is_empty_allowed=True,
             default_value='report',
@@ -128,7 +129,7 @@ class ConsoleArgsLoader(IInputArgsLoader):
         return input_value
 
     def _get_output_format(self) -> Literal['csv', 'tsv', 'json']:
-        input_value = self._ask_input_value(
+        input_value = self._get_input_value(
             value_name='output format',
             is_empty_allowed=True,
             allowed_values=('csv', 'tsv', 'json'),
@@ -138,7 +139,7 @@ class ConsoleArgsLoader(IInputArgsLoader):
         return input_value
 
     def _get_page(self) -> int | None:
-        input_value = self._ask_input_value(
+        input_value = self._get_input_value(
             value_name='page',
             input_type=int,
             is_empty_allowed=True,
@@ -146,14 +147,14 @@ class ConsoleArgsLoader(IInputArgsLoader):
         return input_value
 
     def _get_limit(self) -> int | None:
-        input_value = self._ask_input_value(
+        input_value = self._get_input_value(
             value_name='max number of friends on a page',
             input_type=int,
             is_empty_allowed=True,
         )
         return input_value
 
-    def _ask_input_value(self,
+    def _get_input_value(self,
                          value_name: str,
                          is_empty_allowed: bool,
                          input_type: type[T] = str,
@@ -167,7 +168,7 @@ class ConsoleArgsLoader(IInputArgsLoader):
 
         first_input_value = input(first_input_prompt).strip()
 
-        input_value = self.ask_repeat_value_if_necessary(
+        input_value = self._ask_repeat_value_if_necessary(
             is_empty_allowed, input_type, allowed_values,
             is_case_sensitive, value_name, first_input_value, default_value
         )
@@ -205,17 +206,18 @@ class ConsoleArgsLoader(IInputArgsLoader):
         else:
             return ''
 
-    def ask_repeat_value_if_necessary(self,
-                                      is_empty_allowed: bool,
-                                      input_type: type[T],
-                                      allowed_values: Collection[T],
-                                      is_case_sensitive: bool,
-                                      value_name: str,
-                                      first_input_value: str,
-                                      default_value: T,
-                                      ):
+    def _ask_repeat_value_if_necessary(self,
+                                       is_empty_allowed: bool,
+                                       input_type: type[T],
+                                       allowed_values: Collection[T],
+                                       is_case_sensitive: bool,
+                                       value_name: str,
+                                       first_input_value: str,
+                                       default_value: T | None,
+                                       ) -> T | None:
         if is_empty_allowed and first_input_value == '':
-            return default_value
+            # explicitly return default or None (if default is None)
+            return default_value or None
 
         while True:
             try:
@@ -228,7 +230,7 @@ class ConsoleArgsLoader(IInputArgsLoader):
                     self._validate_for_allowed_values(
                         first_input_value, allowed_values, is_case_sensitive
                     )
-                return first_input_value
+                return input_type(first_input_value)
             except (TypeError, ValueError):
                 first_input_value = input(
                     f"Please, make sure, {value_name} "
@@ -255,20 +257,3 @@ class ConsoleArgsLoader(IInputArgsLoader):
 
         if input_value not in allowed_values:
             raise ValueError()
-
-
-# LOGGING FUNCTIONS
-def log_start_loading_terminal_args():
-    common.logger.info(f"Start loading args from terminal")
-
-
-def log_finish_loading_terminal_args():
-    common.logger.info(f"Successfully loaded args from terminal")
-
-
-def log_start_validating_terminal_args():
-    common.logger.info(f"Start validating args from terminal")
-
-
-def log_finish_validating_terminal_args():
-    common.logger.info(f"Successfully validated args from terminal")
