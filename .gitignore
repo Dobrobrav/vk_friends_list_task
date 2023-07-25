@@ -1,3 +1,5 @@
 .idea
 venv
 logs/log_files
+tests/.pytest_cache
+tests/logs

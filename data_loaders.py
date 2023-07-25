@@ -3,7 +3,6 @@ import pydantic_core
 import requests
 from datetime import datetime
 from typing import Literal, TypeVar
-from requests import Response
 
 import common
 
@@ -21,7 +20,7 @@ class VkDataLoader:
 
     def load_friends_data(self,
                           user_id: int | None,
-                          auth_token: str,
+                          access_token: str,
                           order: str = 'name',
                           fields: str = 'bdate, city, country, sex',
                           page: int | None = None,
@@ -30,7 +29,7 @@ class VkDataLoader:
         log_start_loading_friends_data(user_id)
 
         raw_response = self._request_friends_data(
-            auth_token=auth_token,
+            auth_token=access_token,
             user_id=user_id,
             order=order,
             fields=fields,
@@ -53,7 +52,7 @@ class VkDataLoader:
                               fields: str,
                               page: int | None = None,
                               limit: int | None = None,
-                              ) -> Response:
+                              ) -> requests.Response:
         log_start_http_request(
             url='https://api.vk.com/method/friends.get/'
         )
@@ -78,11 +77,12 @@ class VkDataLoader:
         return request_raw
 
     @staticmethod
-    def _validate_response(response: Response,
+    def _validate_response(response: requests.Response,
                            ) -> common.ResponseWrapper | None:
         log_start_validating_response()
 
         if 'error' in (content := json.loads(response.content)):
+            #
             match content['error']['error_code']:
                 case 5:
                     raise common.InvalidInputError(
@@ -97,7 +97,7 @@ class VkDataLoader:
                         log_error_descr='Invalid vk user id'
                     )
                 case 30:
-                    raise common.ClosedVkProfileError
+                    raise common.ClosedVkProfileError()
                 case _:
                     raise common.UnexpectedVkError()
 
@@ -105,10 +105,8 @@ class VkDataLoader:
             validated_data = common.ResponseWrapper.model_validate_json(
                 response.content
             )
-        except pydantic_core.ValidationError as e:
-            raise pydantic_core.ValidationError(
-                f'Wrong vk response data structure: {e}'
-            )
+        except pydantic_core.ValidationError:
+            raise
 
         if len(validated_data.response.items) == 0:
             print('No friends found. Either you don\'t have vk friends , '

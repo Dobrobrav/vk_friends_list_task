@@ -7,18 +7,19 @@ import data_loaders
 
 def main():
     log_started()
-    print_started()
 
     try:
         # if no args typed, use friendly interface
         if common.is_any_argv_typed():
+            print_app_started_terminal_mode()
             input_args = input_args_loaders.TerminalArgsLoader().load()
         else:
+            print_app_started_console_mode()
             input_args = input_args_loaders.ConsoleArgsLoader().load()
 
         friends_data = data_loaders.VkDataLoader().load_friends_data(
             user_id=input_args.user_id,
-            auth_token=input_args.auth_token,
+            access_token=input_args.auth_token,
             page=input_args.page,
             limit=input_args.limit,
         )
@@ -49,17 +50,23 @@ def main():
 
 
 # FRIENDLY PRINTING FUNCTIONS
-def print_inter_arguments():
+def print_inter_arguments() -> None:
     print('Please type the required arguments: '
           '-a [AUTH_TOKEN], -uid [USER_ID]')
 
 
-def print_started():
+def print_app_started_terminal_mode() -> None:
+    """ Prints that app has started if user provided argv arguments """
+    print('Start working')
+
+
+def print_app_started_console_mode() -> None:
+    """ Print that app has started if user did not provide argv arguments """
     print("Welcome!")
     print("Here you can download list of your friends... (add description)")
 
 
-def print_finished():
+def print_finished() -> None:
     print('Program finished successfully :)')
 
 
@@ -90,11 +97,11 @@ def print_unexpected_error(e: Exception,
 
 
 # LOGGING FUNCTIONS
-def log_started():
+def log_started() -> None:
     common.logger.info('Program started')
 
 
-def log_finished():
+def log_finished() -> None:
     common.logger.info("Program finished successfully")
 
 

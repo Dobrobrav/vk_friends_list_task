@@ -91,6 +91,7 @@ class TerminalArgsLoader(IInputArgsLoader):
 
 
 class ConsoleArgsLoader(IInputArgsLoader):
+    """ Loads arguments from console """
 
     def load(self):
         input_args = common.InputArgs(
@@ -166,12 +167,9 @@ class ConsoleArgsLoader(IInputArgsLoader):
 
         first_input_value = input(first_input_prompt).strip()
 
-        if is_empty_allowed and first_input_value.strip() == '':
-            return default_value
-
         input_value = self.ask_repeat_value_if_necessary(
             is_empty_allowed, input_type, allowed_values,
-            is_case_sensitive, value_name, first_input_value,
+            is_case_sensitive, value_name, first_input_value, default_value
         )
         return input_value
 
@@ -214,7 +212,11 @@ class ConsoleArgsLoader(IInputArgsLoader):
                                       is_case_sensitive: bool,
                                       value_name: str,
                                       first_input_value: str,
+                                      default_value: T,
                                       ):
+        if is_empty_allowed and first_input_value == '':
+            return default_value
+
         while True:
             try:
                 if not is_empty_allowed and first_input_value == '':
