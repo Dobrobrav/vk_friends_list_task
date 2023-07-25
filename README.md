@@ -1,5 +1,5 @@
 # VK FRIENDS REPORT GENERATOR
-VK Friends Report Generator is a console application that generates a report consisting of your (or anyone else's) friends' data and save it in one of the three formats (".csv", ".tsv", ".json")
+VK Friends Report Generator is a console application that generates a report consisting of your (or anyone else's) friends' data and saves it in one of the three formats (".csv", ".tsv", ".json")
 <br/><br/>
 
 ## User instructions:
@@ -43,12 +43,12 @@ VK Friends Report Generator is a console application that generates a report con
 ...
 <br/><br/>
 
-## How the script works:
-1. Script scans and parces console input (access token, user id, output path, etc) into python variables
+## How script works:
+1. Script scans and parses console input (access token, user id, output path, etc) into python variables
 2. Script sends the HTTP-request to VK API for getting friends list, using the input data
 3. Script validates the response for vk errors (invalid access token, invalid user id and others) and  raises Exceptions, if there are errors
 4. Script validates the response json structure (using pydantic) and raises exceptions, if structure is incorrect
-5. Script saves report in provided output path and format.
+5. Script saves report in provided output path and format
 * Script loggs all the main events
 <br/><br/>
 
