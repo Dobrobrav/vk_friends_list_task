@@ -25,6 +25,7 @@ def vk_data_loader():
 def test_load_friends_data(vk_data_loader: data_loaders.VkDataLoader,
                            user_id, access_token, order, fields, page,
                            limit, response_data, expected_result) -> None:
+    """ Testing non-exceptional cases """
     # mocking the '_request_friends_data' func, which accesses VK API,
     # because the response of that function is not consistent,
     # plus don't fancy storing access point in the code, so I use mocking func
@@ -72,6 +73,7 @@ def test_load_friends_data_errors(
         user_id, access_token, order, fields, page,
         limit, response_data, expected_error, is_connection_bad,
 ) -> None:
+    """ Testing exceptional cases """
     # mocking the '_request_friends_data' func, which accesses VK API
     def mock_func(auth_token, user_id, order, fields, page, limit):
         """ raise ConnectionError if network connection is bad """
