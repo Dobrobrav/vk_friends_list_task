@@ -1,5 +1,5 @@
 # VK FRIENDS REPORT GENERATOR
-VK Friends Report Generator is a console application that generates a report consisting of your (or anyone else's) friends' data and saves it in one of the three formats (".csv", ".tsv", ".json")
+VK Friends Report Generator is a console application that generates a report consisting of your (or anyone else's) friends' data and saves it in one of the three formats ("csv", "tsv", "json")
 <br/><br/>
 
 ## User instructions:
