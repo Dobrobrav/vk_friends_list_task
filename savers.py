@@ -43,7 +43,7 @@ class CSVSaver(ISaver, LocalStorageSaverMixin):
              ) -> None:
         log_utils.log_start_saving(self._output_path, 'csv')
 
-        self._allow_create_dir(self._output_path)
+        # self._allow_create_dir(self._output_path)
 
         with open(f'{self._output_path}.csv', mode='w',
                   encoding='utf-8', newline='') as file:
@@ -62,7 +62,7 @@ class TSVSaver(ISaver, LocalStorageSaverMixin):
              ) -> None:
         log_utils.log_start_saving(self._output_path, 'tsv')
 
-        self._allow_create_dir(self._output_path)
+        # self._allow_create_dir(self._output_path)
 
         with open(f'{self._output_path}.tsv', mode='w',
                   encoding='utf-8', newline='') as file:
