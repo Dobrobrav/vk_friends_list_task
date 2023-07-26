@@ -162,6 +162,7 @@ class ConsoleArgsLoader(IInputArgsLoader):
                          default_value: T | None = None,
                          is_case_sensitive: bool = True,
                          ) -> T | None:
+        """ Get input value from console """
         first_input_prompt = self._get_first_input_prompt(
             allowed_values, default_value, is_empty_allowed, value_name
         )
@@ -180,6 +181,7 @@ class ConsoleArgsLoader(IInputArgsLoader):
                                 is_empty_allowed: bool,
                                 value_name: str,
                                 ) -> str:
+        """ Get prompt for first input attempt """
         default_value_str = self._get_default_value_str(default_value)
         is_optional_str = self._get_is_optional_str(is_empty_allowed)
         allowed_values_str = self._get_allowed_values_str(allowed_values)
@@ -215,6 +217,8 @@ class ConsoleArgsLoader(IInputArgsLoader):
                                        first_input_value: str,
                                        default_value: T | None,
                                        ) -> T | None:
+        """ Validate first_input data and ask user to type again,
+        if the data is invalid """
         if is_empty_allowed and first_input_value == '':
             # explicitly return default or None (if default is None)
             return default_value or None
