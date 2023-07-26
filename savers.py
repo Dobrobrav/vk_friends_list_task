@@ -26,6 +26,7 @@ class LocalStorageSaverMixin:
 
 
 class CSVSaver(ISaver, LocalStorageSaverMixin):
+    """ Saves to '.csv' format """
 
     def save(self,
              friends: Sequence[common.FriendDataPretty],
@@ -34,6 +35,7 @@ class CSVSaver(ISaver, LocalStorageSaverMixin):
 
         with open(f'{self._output_path}.csv', mode='w',
                   encoding='utf-8', newline='') as file:
+            log_utils.logger.debug('test' + f'{self._output_path}.csv')
             writer = csv.DictWriter(file, friends[0].keys())
             writer.writeheader()
             writer.writerows(friends)
@@ -42,6 +44,7 @@ class CSVSaver(ISaver, LocalStorageSaverMixin):
 
 
 class TSVSaver(ISaver, LocalStorageSaverMixin):
+    """ Saves to '.tsv' format """
 
     def save(self,
              friends: Sequence[common.FriendDataPretty],
@@ -59,6 +62,7 @@ class TSVSaver(ISaver, LocalStorageSaverMixin):
 
 
 class JSONSaver(ISaver, LocalStorageSaverMixin):
+    """ Saves to '.json' format """
 
     def save(self,
              friends: Sequence[common.FriendDataPretty],
