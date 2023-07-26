@@ -1,5 +1,7 @@
 import csv
 import json
+import os
+
 import tsv
 from abc import ABC, abstractmethod
 from typing import Sequence, Literal
@@ -32,6 +34,11 @@ class CSVSaver(ISaver, LocalStorageSaverMixin):
              friends: Sequence[common.FriendDataPretty],
              ) -> None:
         log_utils.log_start_saving(self._output_path, 'csv')
+
+        # Extract the directory path from the 'path' variable
+        parent_directory = os.path.dirname(self._output_path)
+        # Ensure the parent directory for the file exists
+        os.makedirs(parent_directory, exist_ok=True)
 
         with open(f'{self._output_path}.csv', mode='w',
                   encoding='utf-8', newline='') as file:
