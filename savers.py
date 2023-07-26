@@ -88,6 +88,8 @@ class JSONSaver(ISaver, LocalStorageSaverMixin):
              ) -> None:
         log_utils.log_start_saving(self._output_path, 'json')
 
+        self._allow_create_dirs_if_necessary(self._output_path)
+
         with open(f'{self._output_path}.json', mode='w',
                   encoding='utf-8', newline='') as file:
             json.dump(friends, fp=file, ensure_ascii=False)
