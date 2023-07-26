@@ -24,6 +24,12 @@ VK Friends Report Generator is a console application that generates a report con
    * -f / --output_format (optional argument, default: "csv" – format of the report
    * -pg / --page (optional argument, if None, then no pagination) – requested page
    * -l / --limit (optional argument, default: 14, only works if _page_ is provided) – max page size
+
+  #### Example input
+  ```console
+  python main.py -a vk1.a.m7VxRgYSK8UgTc1VXFdEFdFviqalIoQL2ljBAuFrVpzeyODYKOLqrG6UYod7NzMnmqYcFzv4RY2rZwiHY5X6WEyJg32v7Xo2QNae8lJgiuOgSAOzuGng8Az77eDfSRJvlQZrddlFFusfJVzCVQotvzV5vpjjRPju1VMWIzGdH8qRr_PxPe9mXP3k672Wwaqtugru2kZb67WTgt9PUD8DqQ -p res -f json -l 12 -pg 5
+  ```   
+<br/><br/>
    
    <h4 align='center'>OR</h4>
    
@@ -34,11 +40,7 @@ VK Friends Report Generator is a console application that generates a report con
    2.2. Follow instructions in console
 <br/><br/>
 
-  #### Example input
-  ```console
-  python main.py -a vk1.a.m7VxRgYSK8UgTc1VXFdEFdFviqalIoQL2ljBAuFrVpzeyODYKOLqrG6UYod7NzMnmqYcFzv4RY2rZwiHY5X6WEyJg32v7Xo2QNae8lJgiuOgSAOzuGng8Az77eDfSRJvlQZrddlFFusfJVzCVQotvzV5vpjjRPju1VMWIzGdH8qRr_PxPe9mXP3k672Wwaqtugru2kZb67WTgt9PUD8DqQ -p res -f json -l 12 -pg 5
-  ```   
-<br/><br/>
+
 
 ## How to get vk access token: <a name='get-access-token'></a>
 1. Open https://vk.com/editapp?act=create
