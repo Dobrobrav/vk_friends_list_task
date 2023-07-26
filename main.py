@@ -1,4 +1,6 @@
 import pydantic_core
+import requests
+import urllib3.exceptions
 import common
 import input_args_loaders
 import savers
@@ -10,7 +12,7 @@ def main():
     log_utils.log_started()
 
     try:
-        # if no args typed, use friendly interface
+        # if no argv args typed, use friendly interface
         if common.is_any_argv_typed():
             print_app_started_terminal_mode()
             input_args = input_args_loaders.TerminalArgsLoader().load()
@@ -42,6 +44,9 @@ def main():
     except common.UnexpectedVkError as e:
         print_unknown_vk_error()
         log_utils.log_unexpected_vk_error(e)
+    except requests.exceptions.ConnectionError as e:
+        print_bad_internet_connection()
+        log_utils.log_bad_internet_connection(e)
     except Exception as e:
         print_unexpected_error(e)
         log_utils.log_unexpected_error(e)
@@ -90,6 +95,10 @@ def print_closed_vk_profile_error() -> None:
 def print_unknown_vk_error() -> None:
     print('Something went wrong with the request to vk. '
           'Please check the arguments you typed and try again (maybe later)')
+
+
+def print_bad_internet_connection() -> None:
+    print('bad internet connection ...')
 
 
 def print_unexpected_error(e: Exception,

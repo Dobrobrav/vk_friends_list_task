@@ -1,6 +1,9 @@
 import datetime
 import pydantic_core
+import requests
+
 import common
+import urllib3.exceptions
 from loguru import logger
 
 # remove default loguru handler to stop logs to terminal
@@ -38,6 +41,11 @@ def log_closed_vk_profile_error(e: common.ClosedVkProfileError,
 def log_unexpected_vk_error(e: common.UnexpectedVkError,
                             ) -> None:
     logger.error(f"Unexpected vk error: {e}")
+
+
+def log_bad_internet_connection(e: requests.exceptions.ConnectionError,
+                                ) -> None:
+    logger.error(f"Bad internet connection: {e}")
 
 
 def log_unexpected_error(e: Exception,
