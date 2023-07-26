@@ -26,6 +26,7 @@ class LocalStorageSaverMixin:
 
 
 class CSVSaver(ISaver, LocalStorageSaverMixin):
+    """ Saves to '.csv' format """
 
     def save(self,
              friends: Sequence[common.FriendDataPretty],
@@ -42,6 +43,7 @@ class CSVSaver(ISaver, LocalStorageSaverMixin):
 
 
 class TSVSaver(ISaver, LocalStorageSaverMixin):
+    """ Saves to '.tsv' format """
 
     def save(self,
              friends: Sequence[common.FriendDataPretty],
@@ -59,6 +61,7 @@ class TSVSaver(ISaver, LocalStorageSaverMixin):
 
 
 class JSONSaver(ISaver, LocalStorageSaverMixin):
+    """ Saves to '.json' format """
 
     def save(self,
              friends: Sequence[common.FriendDataPretty],
