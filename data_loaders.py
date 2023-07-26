@@ -84,7 +84,7 @@ class VkDataLoader:
 
         if 'error' in (content := json.loads(response.content)):
             #
-            match content['error']['error_code']:
+            match error_code := content['error']['error_code']:
                 case 5:
                     raise common.InvalidInputError(
                         arg_name='access_token',
@@ -100,7 +100,7 @@ class VkDataLoader:
                 case 30:
                     raise common.ClosedVkProfileError()
                 case _:
-                    raise common.UnexpectedVkError()
+                    raise common.UnexpectedVkError(f"Error code: {error_code}")
 
         try:
             validated_data = common.ResponseWrapper.model_validate_json(
