@@ -35,6 +35,7 @@ class CSVSaver(ISaver, LocalStorageSaverMixin):
 
         with open(f'{self._output_path}.csv', mode='w',
                   encoding='utf-8', newline='') as file:
+            log_utils.logger.debug('test' + f'{self._output_path}.csv')
             writer = csv.DictWriter(file, friends[0].keys())
             writer.writeheader()
             writer.writerows(friends)
