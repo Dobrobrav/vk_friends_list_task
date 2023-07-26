@@ -21,12 +21,18 @@ def tsv_saver() -> savers.TSVSaver:
     return saver
 
 
+@pytest.fixture
+def json_saver() -> savers.JSONSaver:
+    tmp_path = 'some_path'  # temporary path, which will be replaced
+    saver = savers.JSONSaver(tmp_path)
+    return saver
+
+
 @pytest.mark.parametrize(
     'reference_path, test_path, save_data',
     [
         # Test case 1: ...
-        ('ref_files/ref1', 'test_files/test1',
-         data.SAVE_DATA1),
+        ('ref_files/ref1', 'test_files/test1', data.SAVE_DATA1),
 
         # Test case 2: ...
         # (),
@@ -47,8 +53,7 @@ def test_csv_saver_save(csv_saver, reference_path, test_path, save_data):
     'reference_path, test_path, save_data',
     [
         # Test case 1: ...
-        ('ref_files/ref1', 'test_files/test1',
-         data.SAVE_DATA1),
+        ('ref_files/ref1', 'test_files/test1', data.SAVE_DATA1),
 
         # Test case 2: ...
         # (),
@@ -61,6 +66,27 @@ def test_tsv_saver_save(tsv_saver, reference_path, test_path, save_data):
 
     reference_file_data = read_data_from_file(reference_path, 'tsv')
     actual_file_data = read_data_from_file(test_path, 'tsv')
+
+    assert reference_file_data == actual_file_data
+
+
+@pytest.mark.parametrize(
+    'reference_path, test_path, save_data',
+    [
+        # Test case 1: ...
+        ('ref_files/ref1', 'test_files/test1', data.SAVE_DATA1),
+
+        # Test case 2: ...
+        # (),
+    ],
+)
+def test_json_saver_save(json_saver, reference_path, test_path, save_data):
+    json_saver._output_path = test_path
+    log_utils.logger.debug(json_saver._output_path)
+    json_saver.save(save_data)
+
+    reference_file_data = read_data_from_file(reference_path, 'json')
+    actual_file_data = read_data_from_file(test_path, 'json')
 
     assert reference_file_data == actual_file_data
 

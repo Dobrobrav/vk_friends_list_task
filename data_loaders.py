@@ -27,6 +27,8 @@ class VkDataLoader:
                           page: int | None = None,
                           limit: int | None = None,
                           ) -> list[common.FriendDataPretty]:
+        """ Load friends data from VK API and return it in pretty format:
+         with russian titles, changed data format and gender format """
         log_utils.log_start_loading_friends_data(user_id)
 
         raw_response = self._request_friends_data(
@@ -54,6 +56,7 @@ class VkDataLoader:
                               page: int | None = None,
                               limit: int | None = None,
                               ) -> requests.Response:
+        """ Load raw friends data from VK API """
         log_utils.log_start_http_request(
             url='https://api.vk.com/method/friends.get/'
         )
@@ -80,6 +83,7 @@ class VkDataLoader:
     @staticmethod
     def _validate_response(response: requests.Response,
                            ) -> common.ResponseWrapper | None:
+        """ Validate response for vk errors and structure correctness """
         log_utils.log_start_validating_response()
 
         if 'error' in (content := json.loads(response.content)):
@@ -136,6 +140,8 @@ class VkDataLoader:
     def _convert_friends_data_to_pretty(self,
                                         friends_data: list[common.FriendData],
                                         ) -> list[common.FriendDataPretty]:
+        """ Return friends data with russian titles,
+         changed data format and gender format"""
         res = [
             {
                 'Имя': self._get_value_or_empty(friend_data.first_name),
@@ -183,7 +189,7 @@ class VkDataLoader:
         return self._convert_to_iso(raw_birthdate)
 
     @staticmethod
-    def _convert_to_iso(date_str):
+    def _convert_to_iso(date_str: str):
         for format in ("%d.%m", "%d.%m.%Y"):
             # try converting date to on of the formats
             try:
