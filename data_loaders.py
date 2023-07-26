@@ -83,7 +83,6 @@ class VkDataLoader:
         log_utils.log_start_validating_response()
 
         if 'error' in (content := json.loads(response.content)):
-            #
             match error_code := content['error']['error_code']:
                 case 5:
                     raise common.InvalidInputError(

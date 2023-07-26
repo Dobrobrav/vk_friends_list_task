@@ -26,11 +26,17 @@ class LocalStorageSaverMixin:
                  ) -> None:
         self._output_path = output_path
 
-    def _allow_create_dir(self,
-                          path: str,
+    def _allow_create_dirs_if_necessary(self,
+                                        path: str,
+                                        ) -> None:
+        if '/' in self._output_path:
+            self._allow_create_dir(path)
+
+    @staticmethod
+    def _allow_create_dir(path: str,
                           ) -> None:
         # Extract the directory path from the 'path' variable
-        parent_directory = os.path.dirname(self._output_path)
+        parent_directory = os.path.dirname(path)
         # Ensure the parent directory for the file exists
         os.makedirs(parent_directory, exist_ok=True)
 
@@ -43,7 +49,7 @@ class CSVSaver(ISaver, LocalStorageSaverMixin):
              ) -> None:
         log_utils.log_start_saving(self._output_path, 'csv')
 
-        # self._allow_create_dir(self._output_path)
+        self._allow_create_dirs_if_necessary(self._output_path)
 
         with open(f'{self._output_path}.csv', mode='w',
                   encoding='utf-8', newline='') as file:
@@ -62,7 +68,7 @@ class TSVSaver(ISaver, LocalStorageSaverMixin):
              ) -> None:
         log_utils.log_start_saving(self._output_path, 'tsv')
 
-        # self._allow_create_dir(self._output_path)
+        self._allow_create_dirs_if_necessary(self._output_path)
 
         with open(f'{self._output_path}.tsv', mode='w',
                   encoding='utf-8', newline='') as file:
