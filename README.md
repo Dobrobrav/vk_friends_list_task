@@ -29,9 +29,9 @@ VK Friends Report Generator is a console application that generates a report con
   ```console
   python main.py -a vk1.a.m7VxRgYSK8UgTc1VXFdEFdFviqalIoQL2ljBAuFrVpzeyODYKOLqrG6UYod7NzMnmqYcFzv4RY2rZwiHY5X6WEyJg32v7Xo2QNae8lJgiuOgSAOzuGng8Az77eDfSRJvlQZrddlFFusfJVzCVQotvzV5vpjjRPju1VMWIzGdH8qRr_PxPe9mXP3k672Wwaqtugru2kZb67WTgt9PUD8DqQ -p res -f json -l 12 -pg 5
   ```   
-<br/><br/>
+<br/>
    
-   <h4 align='center'>OR</h4>
+   <h3 align='center'>OR</h3>
    
    2.1. Type in terminal:
    ```console
