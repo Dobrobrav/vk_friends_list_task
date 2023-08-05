@@ -15,10 +15,11 @@ def main():
         # if no argv args typed, use friendly interface
         if common.is_any_argv_typed():
             print_app_started_terminal_mode()
-            input_args = input_args_loaders.TerminalArgsLoader().load()
+            loader = input_args_loaders.TerminalArgsLoader()
         else:
             print_app_started_console_mode()
-            input_args = input_args_loaders.ConsoleArgsLoader().load()
+            loader = input_args_loaders.ConsoleArgsLoader()
+        input_args = loader.load()
 
         friends_data = data_loaders.VkDataLoader().load_friends_data(
             user_id=input_args.user_id,

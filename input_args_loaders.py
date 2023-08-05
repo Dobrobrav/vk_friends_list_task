@@ -136,7 +136,7 @@ class ConsoleArgsLoader(IInputArgsLoader):
             default_value='csv',
             is_case_sensitive=False,
         )
-        return input_value
+        return input_value.lower()
 
     def _get_page(self) -> int | None:
         input_value = self._get_input_value(
@@ -254,10 +254,10 @@ class ConsoleArgsLoader(IInputArgsLoader):
     @staticmethod
     def _validate_for_allowed_values(input_value: T,
                                      allowed_values: Collection[T],
-                                     case_sensitive: bool,
+                                     is_case_sensitive: bool,
                                      ) -> None:
         if isinstance(input_value, str):
-            input_value = input_value if case_sensitive else input_value.lower()
+            input_value = input_value if is_case_sensitive else input_value.lower()
 
         if input_value not in allowed_values:
             raise ValueError()

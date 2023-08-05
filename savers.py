@@ -30,11 +30,11 @@ class LocalStorageSaverMixin:
                                         path: str,
                                         ) -> None:
         if '/' in self._output_path:
-            self._allow_create_dir(path)
+            self._allow_create_dirs(path)
 
     @staticmethod
-    def _allow_create_dir(path: str,
-                          ) -> None:
+    def _allow_create_dirs(path: str,
+                           ) -> None:
         # Extract the directory path from the 'path' variable
         parent_directory = os.path.dirname(path)
         # Ensure the parent directory for the file exists
